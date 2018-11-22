@@ -16,8 +16,8 @@ library(lubridate)
 source("Code/R/Settings.R")
 ```
 
-```{r CleanHOBOData}
-CleanHOBOData <- function(fn, trim=c(NA, NA), wind=c(NA, NA), view=TRUE, text=FALSE, ret=FALSE) {
+```{r Code}
+HOBOData <- function(fn, trim=c(NA, NA), wind=c(NA, NA), view=TRUE, text=FALSE, ret=FALSE) {
 # i:
 # fn        Name of the HOBO csv file to load. Assumption: see column names in read_csv call below.
 # trim      Number of observations to remove from beginning and end of data
@@ -95,14 +95,14 @@ CleanHOBOData <- function(fn, trim=c(NA, NA), wind=c(NA, NA), view=TRUE, text=FA
     }
 }
 
-HOBODataSection <- function(fn, l, r) {
-    tb <- ViewHOBOData(fn, view=FALSE, ret=TRUE)
+CleanHOBOData <- function(fn, l, r) {
+    tb <- HOBOData(fn, view=FALSE, ret=TRUE)
     row_ct <- nrow(tb)
     triml <- 1010
     trimr <- 365
-    ViewHOBOData(fn, trim=c(l, r))
-    ViewHOBOData(fn, trim=c(l, r), wind=c(l-50, l+50))
-    ViewHOBOData(fn, trim=c(l, r), wind=c(row_ct-r-50, row_ct-r+50))
+    HOBOData(fn, trim=c(l, r))
+    HOBOData(fn, trim=c(l, r), wind=c(l-50, l+50))
+    HOBOData(fn, trim=c(l, r), wind=c(row_ct-r-50, row_ct-r+50))
     return(tb[l:(row_ct-r),])
 }
 
@@ -137,15 +137,16 @@ data set, with blue vertical lines enclosing the window of valid observations. E
 complete plot is followed my magnifications of each cutoff region.
 
 ### Week 1 (ATS_1)
-```{r week1}
-week1data <- CleanHOBOData(files[[1]], view=FALSE, ret=TRUE)
-row_ct <- nrow(week1data)
-triml <- 1010
-trimr <- 365
-CleanHOBOData(files[[1]], trim=c(triml, trimr))
-CleanHOBOData(files[[1]], trim=c(triml, trimr), wind=c(triml-50, triml+50))
-CleanHOBOData(files[[1]], trim=c(triml, trimr), wind=c(row_ct-trimr-50, row_ct-trimr+50))
-week1data <- week1data[triml:(row_ct-trimr),]
+```{r CleanData}
+week1data <- CleanHOBOData(files[1], 1010, 365)
+# week1data <- CleanHOBOData(files[[1]], view=FALSE, ret=TRUE)
+# row_ct <- nrow(week1data)
+# triml <- 1010
+# trimr <- 365
+# CleanHOBOData(files[[1]], trim=c(triml, trimr))
+# CleanHOBOData(files[[1]], trim=c(triml, trimr), wind=c(triml-50, triml+50))
+# CleanHOBOData(files[[1]], trim=c(triml, trimr), wind=c(row_ct-trimr-50, row_ct-trimr+50))
+# week1data <- week1data[triml:(row_ct-trimr),]
 ```
 
 For this first file, both data loggers were initialized in the afternoon,
