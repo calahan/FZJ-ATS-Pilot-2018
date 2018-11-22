@@ -126,133 +126,49 @@ illumination, temperature, and biomass productivity data were collected. The fac
 was removed from the WWTP at the end of September. This document describes the data
 collection for this pilot project and summarizes the results.  
 
-## Cleaning of Illumination and Temperature Data  
+## Temperature and Illumination Data  
 Two HOBO data loggers (ATS_1 and ATS_2) were used to gather temperature and illumination
-data, with one observation recorded per minute. The loggers were exchanged each week.
-Here we read the individual HOBO csv files and clean the data. To clean the data we need
-to trim away observations that were not taken while the data logger was actually
+data, with one observation recorded per minute. The loggers were exchanged each week as part of the harvesting protocol.
+We read each HOBO csv file and clean the data by removing observations not taken while the data logger was
 installed in the floway. We open each file in order and determine which observations
 need to be removed by visual inspection. The following sections plot each complete
 data set, with blue vertical lines enclosing the window of valid observations. Each
-complete plot is followed my magnifications of each cutoff region.
+complete plot is followed my magnifications of each cutoff region. During the data cleaning process, the cleaned data
+is accumulated into a single data frame and then saved.
 
-### Week 1 (ATS_1)
-```{r CleanData}
-week1data <- CleanHOBOData(files[1], 1010, 365)
-# week1data <- CleanHOBOData(files[[1]], view=FALSE, ret=TRUE)
-# row_ct <- nrow(week1data)
-# triml <- 1010
-# trimr <- 365
-# CleanHOBOData(files[[1]], trim=c(triml, trimr))
-# CleanHOBOData(files[[1]], trim=c(triml, trimr), wind=c(triml-50, triml+50))
-# CleanHOBOData(files[[1]], trim=c(triml, trimr), wind=c(row_ct-trimr-50, row_ct-trimr+50))
-# week1data <- week1data[triml:(row_ct-trimr),]
+# Figures  
+### Temperature and Illumination, Week 1 (ATS_1)  
+```{r week1}
+data <- CleanHOBOData(files[1], 1010, 365)
 ```
 
-For this first file, both data loggers were initialized in the afternoon,
-and then ATS_1 was installed the next morning. We first glimpse the whole file. We see
-six complete days worth of observations and the beginning of a sixth day. Illumination ranges
-from 0 lux (darkness) to well above 150.000 lux (full sunlight), whereas temperature shows
-an expected rise and fall each day. As
-there are 10.028 observations total, The first 1.500 or so observations must contain the time at which the logger was installed.
-\newpage
-
+### Temperature and Illumination, Week 2 (ATS_2)  
 ```{r week2}
-week2data <- CleanHOBOData(files[[2]], ret=TRUE)
-row_ct <- nrow(week2data)
-triml <- 9773
-trimr <- 271
-CleanHOBOData(files[[2]], trim=c(triml, trimr))
-CleanHOBOData(files[[2]], trim=c(triml, trimr), wind=c(triml-50, triml+50))
-CleanHOBOData(files[[2]], trim=c(triml, trimr), wind=c(row_ct-trimr-50, row_ct-trimr+50))
-week2data <- week2data[triml:(row_ct-trimr),]
+data <- data %>% rbind(CleanHOBOData(files[2], 9773, 271))
 ```
 
-Here we zoom in to the first 1.500 observations. To the left of the illumination
-observations are low peaks representing light levels inside 
-Dean's office, followed by a period of darkness, then a series of peaks
-representing dawn and Dean taking ATS_1 out to the floway. The temperature profile is more
-revealing, with a high afternoon temperature falling off smoothly over the night, dawn bringing in
-some heat, followed by placing the HOBO into the cool water of the floway.
-
+### Temperature and Illumination, Week 3 (ATS_1)  
 ```{r week3}
-week3data <- CleanHOBOData(files[[3]], ret=TRUE)
-row_ct <- nrow(week3data)
-triml <- 119
-trimr <- 96
-CleanHOBOData(files[[3]], trim=c(triml, trimr))
-CleanHOBOData(files[[3]], trim=c(triml, trimr), wind=c(triml-50, triml+50))
-CleanHOBOData(files[[3]], trim=c(triml, trimr), wind=c(row_ct-trimr-50, row_ct-trimr+50))
-week3data <- week3data[triml:(row_ct-trimr),]
+data <- data %>% rbind(CleanHOBOData(files[3], 119, 96))
 ```
 
-Here we zoom in to where the temperature really drops off around 8:30, representing
-placing the HOBO into the water, then zoom in further to deterimine the precise initial observation,
-which is #1009. Thus we know to trim observations from 1:1008 in this file, with the first relevant observation
-at `r week1data[2,]$datetime`.
-
+### Temperature and Illumination, Week 4 (ATS_2)  
 ```{r week4}
-week4data <- CleanHOBOData(files[[4]], ret=TRUE)
-row_ct <- nrow(week4data)
-triml <- 107
-trimr <- 227
-CleanHOBOData(files[[4]], trim=c(triml, trimr))
-CleanHOBOData(files[[4]], trim=c(triml, trimr), wind=c(triml-50, triml+50))
-CleanHOBOData(files[[4]], trim=c(triml, trimr), wind=c(row_ct-trimr-50, row_ct-trimr+50))
-week4data <- week4data[triml:(row_ct-trimr),]
+data <- data %>% rbind(CleanHOBOData(files[4], 107, 227))
 ```
 
-Here we wish to determine the end of the Week 1 recording period for HOBO ATS_1. Here we
-zoom in on the last 1.500 observations and observe that on Tuesday morning illumination starts
-to rise but then drops off sharply as ATS_1 is removed from the floway and stowed. Zooming
-in further reveals that observation #9663 is the one after which the Lux declines, thus we
-know to select observations 1009:9663 for the cleaned Week 1 data.
-\newpage
-### Week 2 (ATS_2)   
+### Temperature and Illumination, Week 5 (ATS_1)  
 ```{r week5}
-week5data <- CleanHOBOData(files[[5]], ret=TRUE)
-row_ct <- nrow(week5data)
-triml <- 107
-trimr <- 227
-CleanHOBOData(files[[5]], trim=c(triml, trimr))
-CleanHOBOData(files[[5]], trim=c(triml, trimr), wind=c(triml-50, triml+50))
-CleanHOBOData(files[[5]], trim=c(triml, trimr), wind=c(row_ct-trimr-50, row_ct-trimr+50))
-week5data <- week5data[triml:(row_ct-trimr),]
+data <- data %>% rbind(CleanHOBOData(files[5], 107, 227))
 ```
 
-Here we see the total data for ATS_2, which was initiliazed at the same time as ATS_1, but
-left in Dean's office. We know when ATS_1 was removed from the floway; ATS_2 was installed
-probably no more than an hour after that.
-
+### Temperature and Illumination, Week 6 (ATS_2)  
 ```{r week6}
-week6data <- CleanHOBOData(files[[6]], ret=TRUE)
-row_ct <- nrow(week6data)
-triml <- 121
-trimr <- 65
-CleanHOBOData(files[[6]], trim=c(triml, trimr))
-CleanHOBOData(files[[6]], trim=c(triml, trimr), wind=c(triml-50, triml+50))
-CleanHOBOData(files[[6]], trim=c(triml, trimr), wind=c(row_ct-trimr-50, row_ct-trimr+50))
-week6data <- week6data[triml:(row_ct-trimr),]
+data <- data %>% rbind(CleanHOBOData(files[6], 121, 65))
 ```
-Here we determine the first observation from Week2 that is later than the last observation
-from the cleaned Week 1 data (#`r triml`, corresponding to `r week2data[triml,]$datetime`).
-We then zoom in on the 120 observations starting 10 minutes before that one. We
-observe a distinct rise in illumination that corresponds with a steep decline in
-temperature as ATS_2 is retrieved and placed in the water flow. We then zoom in
-closer to determine the exact observation corresponding to this event. Unsurprisingly,
-this appears to be the one immediately following the one when ATS_1 was removed,
-or `r triml+1`. We then zoom in on the end of the observations as with week 1 to determine
-the final relevant observation, focusing on the moment when both illumination and
-temperature begin to fall rapidly. This occurs at observation `r format(trimr-271, scientific=FALSE)`.
 
-
+### Temperature and Illumination, Week 7 (ATS_1)  
 ```{r week7}
-week7data <- CleanHOBOData(files[[7]], ret=TRUE)
-row_ct <- nrow(week7data)
-triml <- 84
-trimr <- 54
-CleanHOBOData(files[[7]], trim=c(triml, trimr))
-CleanHOBOData(files[[7]], trim=c(triml, trimr), wind=c(triml-50, triml+50))
-CleanHOBOData(files[[7]], trim=c(triml, trimr), wind=c(row_ct-trimr-50, row_ct-trimr+50))
-week7data <- week7data[triml:(row_ct-trimr),]
+data <- data %>% rbind(CleanHOBOData(files[7], 84, 54))
+write_csv(data, "Data/csv/FZJATSPilot.csv")
 ```
