@@ -1,5 +1,5 @@
 ---
-title: 'FZ-J WWTP ATS Pilot'
+title: 'FZ-J WWTP ATS Pilot Data Analysis'
 author: "Dean Calahan"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
@@ -18,7 +18,7 @@ source("Code/R/Settings.R")
 ```
 
 ```{r Code}
-HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), wind=c(NA, NA), view=TRUE, text=FALSE, ret=FALSE) {
+HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), wind=c(NA, NA), view=TRUE, text=FALSE, ret=FALSE, week=NA) {
 # i:
 # fn        Name of the HOBO csv file to load
 # trim      Number of observations to remove from beginning and end of data
@@ -26,6 +26,7 @@ HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), wind=c(NA, NA), v
 # view      Whether to plot the data
 # text      Whether to display text with count of observations in the csv file
 # ret       Whether to return the trimmed dataset
+# week      Which week is represented by this file
 #
     tb <- read_csv(paste0(csvdir, fn), skip=2, col_names=c(
         "id",
@@ -92,16 +93,18 @@ HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), wind=c(NA, NA), v
         
     }
     
+    if(!is.na(week)) {
+        tb$week <- week
+    }
+    
     if(ret) {
         return(tb[trim[1]:trim[2],])
     }
 }
 
-CleanHOBOData <- function(fn, l, r) {
-    tb <- HOBOData(fn, view=FALSE, ret=TRUE)
+CleanHOBOData <- function(fn, l, r, w) {
+    tb <- HOBOData(fn, view=FALSE, ret=TRUE, week=w)
     row_ct <- nrow(tb)
-    triml <- 1010
-    trimr <- 365
     HOBOData(fn, trim=c(l, r))
     HOBOData(fn, trim=c(l, r), wind=c(l-50, l+50))
     HOBOData(fn, trim=c(l, r), wind=c(row_ct-r-50, row_ct-r+50))
@@ -150,43 +153,43 @@ is accumulated into a single data frame and then saved.
 # Figures  
 ### Temperature and Illumination, Week 1 (ATS_1)  
 ```{r week1}
-data <- CleanHOBOData(csvfiles[1], 1010, 365)
+ti_df <- CleanHOBOData(csvfiles[1], 1010, 365, w=1)
 ```
 
 ### Temperature and Illumination, Week 2 (ATS_2)  
 ```{r week2}
-data <- data %>% rbind(CleanHOBOData(csvfiles[2], 9773, 271))
+ti_df <- ti_df %>% rbind(CleanHOBOData(csvfiles[2], 9773, 271, w=2))
 ```
 
 ### Temperature and Illumination, Week 3 (ATS_1)  
 ```{r week3}
-data <- data %>% rbind(CleanHOBOData(csvfiles[3], 119, 96))
+ti_df <- ti_df %>% rbind(CleanHOBOData(csvfiles[3], 119, 96, w=3))
 ```
 
 ### Temperature and Illumination, Week 4 (ATS_2)  
 ```{r week4}
-data <- data %>% rbind(CleanHOBOData(csvfiles[4], 107, 227))
+ti_df <- ti_df %>% rbind(CleanHOBOData(csvfiles[4], 107, 227, w=4))
 ```
 
 ### Temperature and Illumination, Week 5 (ATS_1)  
 ```{r week5}
-data <- data %>% rbind(CleanHOBOData(csvfiles[5], 107, 227))
+ti_df <- ti_df %>% rbind(CleanHOBOData(csvfiles[5], 107, 227, w=5))
 ```
 
 ### Temperature and Illumination, Week 6 (ATS_2)  
 ```{r week6}
-data <- data %>% rbind(CleanHOBOData(csvfiles[6], 121, 65))
+ti_df <- ti_df %>% rbind(CleanHOBOData(csvfiles[6], 121, 65, w=6))
 ```
 
 ### Temperature and Illumination, Week 7 (ATS_1)  
 ```{r week7}
-data <- data %>% rbind(CleanHOBOData(csvfiles[7], 84, 54))
+ti_df <- ti_df %>% rbind(CleanHOBOData(csvfiles[7], 84, 54, w=7))
 write_csv(data, paste0(datadir, "FZJATSPilot.csv"))
 ```
 
 # Floway Chemistry & Biomass
 ```{r Floway}
-fw_tb <- read_excel(chemfile,
+wc_df <- read_excel(chemfile,
                     sheet="Tabelle1",
                     skip=3,
                     col_names=c("date",
@@ -208,8 +211,10 @@ fw_tb <- read_excel(chemfile,
                                "bmdrypct",
                                "pH"))
 
-# Impute 8:00 for missing times
-fw_tb[which(is.na(fw_tb$time)),]$time <- make_datetime(2018,
+# Impute 8:00 for missing times. This is for a potentially meaningless sense of completeness as the
+# time value is not actually used for any calculations. Howver it could be used to confirm/refine the 
+# data trimming windows.
+wc_df[which(is.na(wc_df$time)),]$time <- make_datetime(2018,
                                                        12,
                                                        31,
                                                        8,
@@ -217,35 +222,54 @@ fw_tb[which(is.na(fw_tb$time)),]$time <- make_datetime(2018,
                                                        0)
 
 # Create a new data frame with date and time combined into datetime for each observation
-fw_df <- data.frame(datetime=make_datetime(year(fw_tb$date),
-                                           month(fw_tb$date),
-                                           day(fw_tb$date),
-                                           hour(fw_tb$time),
-                                           minute(fw_tb$time),
-                                           second(fw_tb$time),
+fw_df <- data.frame(datetime=make_datetime(year(wc_df$date),
+                                           month(wc_df$date),
+                                           day(wc_df$date),
+                                           hour(wc_df$time),
+                                           minute(wc_df$time),
+                                           second(wc_df$time),
                                            tz="Europe/Berlin"))
 
 # Make before/after a logical
 fw_df$before <- TRUE
-fw_df[which(fw_tb$beforeafter != "before"),]$before <- FALSE
+fw_df[which(wc_df$beforeafter != "before"),]$before <- FALSE
 
 # Nutrient concentrations & pH
-fw_df$PO4P <- fw_tb$PO4P
-fw_df$TN <- fw_tb$TN
-fw_df$pH <- fw_tb$pH
+fw_df$PO4P <- wc_df$PO4P
+fw_df$TN <- wc_df$TN
+fw_df$pH <- wc_df$pH
 
 # Make frozen/not frozen a logical
 fw_df$frozen <- TRUE
-fw_df[which(fw_tb$comment != "frozen"),]$frozen <- FALSE
+fw_df[which(wc_df$comment != "frozen"),]$frozen <- FALSE
 
 # Date of assay
-fw_df$assaydate <- make_date(year(fw_tb$assaydate),
-                                 month(fw_tb$assaydate),
-                                 day(fw_tb$assaydate))
+fw_df$assaydate <- make_date(year(wc_df$assaydate),
+                                 month(wc_df$assaydate),
+                                 day(wc_df$assaydate))
+
+# Add a week number corresponding to ti_df
+week_num_days <- function(x) {
+    return(c(min(ti_df[ti_df$week == x,]$datetime), max(ti_df[ti_df$week == x,]$datetime)))
+}
 
 # Biomass measurements
-fw_df$wet_biomass <- fw_tb$bmwet
-fw_df$dry_biomass <- fw_tb$bmdry
-fw_df$solids <- fw_tb$bmdrypct
+fw_df$wet_biomass <- wc_df$bmwet
+fw_df$dry_biomass <- wc_df$bmdry
+fw_df$solids <- wc_df$bmdrypct
 ```
-Time of observation is missing for 18.09.05 - 18.09.06, we impute 8:00 for these times original data set. Here we impute
+
+## Correlation of nutrient removal with temperature and illumination.  
+We initially assume that nutrient removal is a function of algal metabolic activity,
+which itself we assume is a function of temperature and illumination. We first
+integrate these observations for each nutrient assay interval by converting degrees
+Celsius to degrees Kelvin, summing the temperatures and illumination readings for each
+interval to obtain values for "degree minutes" (DM) and "lux minutes" (LM). For each interval
+we then multiply DM x LM and plot these values against nutrient removal for that interval.
+
+```{r DMLM1}
+unique(wday(wc_df[wc_df$week == 1,]$datetime))
+
+```
+
+To integrate temperature data we convert degrees Celsius to degrees Kelvin then sum
