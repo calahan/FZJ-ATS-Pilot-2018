@@ -19,6 +19,7 @@ source("Code/R/Settings.R")
 
 ```{r Code}
 HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), wind=c(NA, NA), view=TRUE, text=FALSE, ret=FALSE, week=NA) {
+#
 # i:
 # fn        Name of the HOBO csv file to load
 # trim      Number of observations to remove from beginning and end of data
@@ -27,6 +28,11 @@ HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), wind=c(NA, NA), v
 # text      Whether to display text with count of observations in the csv file
 # ret       Whether to return the trimmed dataset
 # week      Which week is represented by this file
+#
+# o:        If requested, a tibble containing the HOBO data from the specified file, with first
+#           and last data elided.
+#
+# s:        A plot is generated if requested, displaying the data within the specified window
 #
     tb <- read_csv(paste0(csvdir, fn), skip=2, col_names=c(
         "id",
@@ -184,7 +190,7 @@ ti_df <- ti_df %>% rbind(CleanHOBOData(csvfiles[6], 121, 65, w=6))
 ### Temperature and Illumination, Week 7 (ATS_1)  
 ```{r week7}
 ti_df <- ti_df %>% rbind(CleanHOBOData(csvfiles[7], 84, 54, w=7))
-write_csv(data, paste0(datadir, "FZJATSPilot.csv"))
+write_csv(ti_df, paste0(datadir, "FZJATSPilot.csv"))
 ```
 
 # Floway Chemistry & Biomass
@@ -211,9 +217,9 @@ wc_df <- read_excel(chemfile,
                                "bmdrypct",
                                "pH"))
 
-# Impute 8:00 for missing times. This is for a potentially meaningless sense of completeness as the
-# time value is not actually used for any calculations. Howver it could be used to confirm/refine the 
-# data trimming windows.
+# Impute missing times. We take the minimum time, and simply add 24 hours to it
+no_times <- which(is.na(wc_df$time))
+min_time <- min(ti_df[ti_df$week == 1,]$datetime)
 wc_df[which(is.na(wc_df$time)),]$time <- make_datetime(2018,
                                                        12,
                                                        31,
@@ -249,9 +255,14 @@ fw_df$assaydate <- make_date(year(wc_df$assaydate),
                                  day(wc_df$assaydate))
 
 # Add a week number corresponding to ti_df
-week_num_days <- function(x) {
-    return(c(min(ti_df[ti_df$week == x,]$datetime), max(ti_df[ti_df$week == x,]$datetime)))
-}
+# week_num_dates <- function(x) {
+#     t <- unique(make_date(year(ti_df[ti_df$week == x,]$datetime),
+#                      month(ti_df[ti_df$week == x,]$datetime),
+#                      day(ti_df[ti_df$week == x,]$datetime)))
+#     return(c(min(t), max(t)))
+# }
+# t <- week_num_dates(1)
+# which(fw_df$datetime >= t[1] & fw_df$datetime <= t[2])
 
 # Biomass measurements
 fw_df$wet_biomass <- wc_df$bmwet
@@ -267,9 +278,52 @@ Celsius to degrees Kelvin, summing the temperatures and illumination readings fo
 interval to obtain values for "degree minutes" (DM) and "lux minutes" (LM). For each interval
 we then multiply DM x LM and plot these values against nutrient removal for that interval.
 
-```{r DMLM1}
-unique(wday(wc_df[wc_df$week == 1,]$datetime))
+```{r DMLM}
+# A global list of unique dates of nutrient assays
+nutdates <- sort(unique(make_date(year(fw_df$datetime), month(fw_df$datetime), day(fw_df$datetime))))
 
+IntegrateObs <- function(day, diag=FALSE) {
+#
+# i:    startdate
+#
+# o:    The number of degree minutes between the observation time of the given start date
+#       and the next observation time
+#
+# g:    
+#
+    # Day 1 is an error because there was no previous sample
+    if(day == 1) {
+        stop("Day 1 illegal")
+    }
+    
+    # If day is larger than number of observations, it is an error
+    if(day > length(nutdates)) {
+        stop("Day too large")
+    }
+    
+    # What are the bracketing datetimes
+    t2 <- min(fw_df[which(year(fw_df$datetime) == year(nutdates[day]) &
+                         month(fw_df$datetime) == month(nutdates[day]) &
+                         day(fw_df$datetime) == day(nutdates[day])),]$datetime)
+    
+    t1 <- min(fw_df[which(year(fw_df$datetime) == year(nutdates[day-1]) &
+                         month(fw_df$datetime) == month(nutdates[day-1]) &
+                         day(fw_df$datetime) == day(nutdates[day-1])),]$datetime)
+    
+    # What are the temperature and lux measurements between these brackets?
+    temps <- ti_df[ti_df$datetime >= t1 & ti_df$datetime < t2,]$temp + C2K
+    luxs <-  ti_df[ti_df$datetime >= t1 & ti_df$datetime < t2,]$lux
+    
+    if(diag) {
+        cat(paste0("Number of observations: ", length(temps), "\n"))
+    }
+    
+    return(c(sum(temps), sum(luxs)))
+}
+
+int_obs <- t(simplify2array(lapply(2:26, IntegrateObs)))
+obs_df <- data.frame(datetime=nutdates[2:26], temps=int_obs[,1], luxs=int_obs[,2])
+plot(obs_df$datetime, obs_df$temps, type="h")
 ```
 
 To integrate temperature data we convert degrees Celsius to degrees Kelvin then sum
