@@ -241,7 +241,7 @@ fw_df$before <- TRUE
 fw_df[which(wc_df$beforeafter != "before"),]$before <- FALSE
 
 # Nutrient concentrations & pH
-fw_df$PO4P <- wc_df$PO4P
+fw_df$PO4P <- wc_df$PO4Pxdil
 fw_df$TN <- wc_df$TN
 fw_df$pH <- wc_df$pH
 
@@ -268,6 +268,9 @@ fw_df$assaydate <- make_date(year(wc_df$assaydate),
 fw_df$wet_biomass <- wc_df$bmwet
 fw_df$dry_biomass <- wc_df$bmdry
 fw_df$solids <- wc_df$bmdrypct
+
+# Need observation date separately to make life easier
+fw_df$obsdate <- make_date(year(fw_df$datetime), month(fw_df$datetime), day(fw_df$datetime))
 ```
 
 ## Correlation of nutrient removal with temperature and illumination.  
@@ -326,4 +329,40 @@ obs_df <- data.frame(datetime=nutdates[2:26], temps=int_obs[,1], luxs=int_obs[,2
 plot(obs_df$datetime, obs_df$temps, type="h")
 ```
 
-To integrate temperature data we convert degrees Celsius to degrees Kelvin then sum
+To integrate temperature and illumination data we sum the values (after converting temperature from degrees
+Celsius to degrees Kelvin) approximate for each interval between N and P assays. 
+
+## Validity of nutrient assays of frozen samples
+```{r Frozen}
+# Which assays had results for both frozen and non-frozen samples?
+#
+# First get indices of before/after for frozen/nonfrozen samples
+nf_before <- which(fw_df$frozen == FALSE & fw_df$before == TRUE)
+nf_after <- which(fw_df$frozen == FALSE & fw_df$before == FALSE)
+f_before <- which(fw_df$frozen == TRUE & fw_df$before == TRUE)
+f_after <- which(fw_df$frozen == TRUE & fw_df$before == FALSE)
+
+# Then, for each assay that was frozen, was there a frozen assay for that date,
+# And for each assay that wasn't frozen, was there an unfrozen assay for that date
+both_before_nf <- fw_df[nf_before,]$obsdate %in% fw_df[f_before,]$obsdate
+both_after_nf <- fw_df[nf_after,]$obsdate %in% fw_df[f_after,]$obsdate
+both_before_f <- fw_df[f_before,]$obsdate %in% fw_df[nf_before,]$obsdate
+both_after_f <- fw_df[f_after,]$obsdate %in% fw_df[nf_after,]$obsdate
+
+# What are the dates for all those
+nf_before_dates <- fw_df[nf_before[both_before_nf],]$obsdate
+# nf_after_dates <- fw_df[nf_after[both_after_nf],]$obsdate
+# f_before_dates <- fw_df[f_before[both_before_f],]$obsdate
+# f_after_dates <- fw_df[f_after[both_after_f],]$obsdate
+
+# What are the differences between the measurements
+N_nf_before <- fw_df[nf_before[both_before_nf],]$TN
+N_f_before <- fw_df[f_before[both_before_f],]$TN
+P_nf_before <- fw_df[nf_before[both_before_nf],]$PO4P
+P_f_before <- fw_df[f_before[both_before_f],]$PO4P
+
+N_rat <- (N_nf_before - N_f_before) / N_nf_before
+P_rat <- (P_nf_before - P_f_before) / P_nf_before
+```
+Samples taken on `r nf_before_dates[1]` and `r nf_before_dates[2]` were assayed both
+immediately after sampling and after having been frozen.
