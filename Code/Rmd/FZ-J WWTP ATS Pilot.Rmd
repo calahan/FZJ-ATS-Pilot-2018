@@ -14,6 +14,7 @@ library(readr)
 library(readxl)
 library(dplyr)
 library(lubridate)
+library(knitr)
 source("Code/R/Settings.R")
 ```
 
@@ -326,7 +327,8 @@ IntegrateObs <- function(day, diag=FALSE) {
 
 int_obs <- t(simplify2array(lapply(2:26, IntegrateObs)))
 obs_df <- data.frame(datetime=nutdates[2:26], temps=int_obs[,1], luxs=int_obs[,2])
-plot(obs_df$datetime, obs_df$temps, type="h")
+barplot(height=obs_df$temps, names.arg=obs_df$datetime)
+barplot(height=obs_df$lux, names.arg=obs_df$datetime)
 ```
 
 To integrate temperature and illumination data we sum the values (after converting temperature from degrees
@@ -365,4 +367,31 @@ N_rat <- (N_nf_before - N_f_before) / N_nf_before
 P_rat <- (P_nf_before - P_f_before) / P_nf_before
 ```
 Samples taken on `r nf_before_dates[1]` and `r nf_before_dates[2]` were assayed both
-immediately after sampling and after having been frozen.
+immediately after sampling and after having been frozen. The readings of frozen N
+samples differed by `r 100*N_rat[1]`% and `r 100*N_rat[2]`%, and the readings of frozen P
+samples differed by `r 100*P_rat[1]`% and `r 100*P_rat[2]`%, respectively. These differences are very small so the
+samples were frozen and accumulated and assayed in batches.
+
+```{r NutrientAssays}
+# Create a table for displaying dates of assays
+assay_df <- data.frame(obsdate = fw_df$obsdate,
+                       frozen = fw_df$frozen,
+                       assaydate = fw_df$assaydate,
+                       daysfrozen = as.integer(fw_df$assaydate - fw_df$obsdate))
+
+kable(assay_df)
+
+# Create a data frame without the duplicate dates
+assay_df <- fw_df[-c(nf_before[both_before_nf],nf_after[both_after_nf]),]
+
+# Create a data frame for deltas between before/after
+before_df <- assay_df %>%
+    filter(before == TRUE) %>%
+    select(datetime, PO4P, TN, pH)
+
+after_df <- assay_df %>%
+    filter(before == FALSE) %>%
+    select(datetime, PO4P, TN, pH)
+```
+
+```{r NutrientData}
