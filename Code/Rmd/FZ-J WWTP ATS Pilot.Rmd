@@ -1,6 +1,10 @@
 ---
-title: 'FZ-J WWTP ATS Pilot Data Analysis'
-author: "Dean Calahan"
+title: 'FZ-J WWTP ATS Pilot'
+subtitle: 'Data Analysis'
+author:
+- Dean Calahan^[Smithsonian Institution]
+- Isabel Meuser^[Forschungszentrum Jülich]
+- Ladislav Nedbal^[Forschungszentrum Jülich]
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
 ---
@@ -16,144 +20,153 @@ library(dplyr)
 library(lubridate)
 library(knitr)
 source("Code/R/Settings.R")
+source("Code/R/FZJWWTPP.R")
 ```
 
 ```{r Code}
-HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), wind=c(NA, NA), view=TRUE, text=FALSE, ret=FALSE, week=NA) {
-#
-# i:
-# fn        Name of the HOBO csv file to load
-# trim      Number of observations to remove from beginning and end of data
-# wind      Beginning and end indices of data to plot (if view==TRUE)
-# view      Whether to plot the data
-# text      Whether to display text with count of observations in the csv file
-# ret       Whether to return the trimmed dataset
-# week      Which week is represented by this file
-#
-# o:        If requested, a tibble containing the HOBO data from the specified file, with first
-#           and last data elided.
-#
-# s:        A plot is generated if requested, displaying the data within the specified window
-#
-    tb <- read_csv(paste0(csvdir, fn), skip=2, col_names=c(
-        "id",
-        "date",
-        "time",
-        "tmp",
-        "lx")) %>% transmute(
-            datetime = make_datetime(year(mdy(date)),
-                                     month(mdy(date)),
-                                     day(mdy(date)),
-                                     hour(time),
-                                     minute(time),
-                                     second(time),
-                                     tz=zone),
-            temp=tmp,
-            lux=lx
-        )
-    
-    row_ct <- nrow(tb)
-    
-    # Adjust trim[2] to reflect actual index, not number of observations to remove
-    if(is.na(trim[1])) {
-        trim <- c(0, row_ct)
-    } else {
-    trim <- c(trim[1], row_ct - trim[2])
-    }
+# HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), wind=c(NA, NA), view=TRUE, text=FALSE, ret=FALSE, week=NA) {
+# #
+# # i:
+# # fn        Name of the HOBO csv file to load
+# # trim      Number of observations to remove from beginning and end of data
+# # wind      Beginning and end indices of data to plot (if view==TRUE)
+# # view      Whether to plot the data
+# # text      Whether to display text with count of observations in the csv file
+# # ret       Whether to return the trimmed dataset
+# # week      Which week is represented by this file
+# #
+# # o:        If requested, a tibble containing the HOBO data from the specified file, with first
+# #           and last data elided.
+# #
+# # s:        A plot is generated if requested, displaying the data within the specified window
+# #
+#     tb <- read_csv(paste0(csvdir, fn), skip=2, col_names=c(
+#         "id",
+#         "date",
+#         "time",
+#         "tmp",
+#         "lx")) %>% transmute(
+#             datetime = make_datetime(year(mdy(date)),
+#                                      month(mdy(date)),
+#                                      day(mdy(date)),
+#                                      hour(time),
+#                                      minute(time),
+#                                      second(time),
+#                                      tz=zone),
+#             temp=tmp,
+#             lux=lx
+#         )
+#     
+#     row_ct <- nrow(tb)
+#     
+#     # Adjust trim[2] to reflect actual index, not number of observations to remove
+#     if(is.na(trim[1])) {
+#         trim <- c(0, row_ct)
+#     } else {
+#     trim <- c(trim[1], row_ct - trim[2])
+#     }
+# 
+#     if(is.na(wind[1])) {
+#         wind <- c(1, row_ct)
+#     }
+# 
+#     if(text) {
+#         cat(paste0(fn, ": ", nrow(tb), " ", "observations\n"))
+#     }
+#     
+#     if(view) {
+#         par(mfrow=c(1,2))
+#         
+#         plot(x=tb[wind[1]:wind[2],]$datetime,
+#              y=tb[wind[1]:wind[2],]$lux,
+#              type="l",
+#              main=paste0("lux ", fn),
+#              xlab="Date",
+#              ylab="Lux")
+#         
+#         abline(v=c(tb[trim[1],]$datetime,
+#                    tb[trim[2],]$datetime),
+#                col=c("blue", "blue"),
+#                lty=c(1, 1),
+#                lwd=c(1, 1))
+#         
+#         plot(x=tb[wind[1]:wind[2],]$datetime,
+#              y=tb[wind[1]:wind[2],]$temp,
+#              type="l",
+#              main=paste0("temp ", fn),
+#              xlab="Date",
+#              ylab="Temperature")
+#         
+#         abline(v=c(tb[trim[1],]$datetime,
+#                    tb[trim[2],]$datetime),
+#                col=c("blue", "blue"),
+#                lty=c(1, 1),
+#                lwd=c(1, 1))
+#         
+#     }
+#     
+#     if(!is.na(week)) {
+#         tb$week <- week
+#     }
+#     
+#     if(ret) {
+#         return(tb[trim[1]:trim[2],])
+#     }
+# }
+# 
+# CleanHOBOData <- function(fn, l, r, w) {
+#     tb <- HOBOData(fn, view=FALSE, ret=TRUE, week=w)
+#     row_ct <- nrow(tb)
+#     HOBOData(fn, trim=c(l, r))
+#     HOBOData(fn, trim=c(l, r), wind=c(l-50, l+50))
+#     HOBOData(fn, trim=c(l, r), wind=c(row_ct-r-50, row_ct-r+50))
+#     return(tb[l:(row_ct-r),])
+# }
+# 
+# # File names
+# csvfiles <- c("ATS_1.11.09.18.csv",
+#            "ATS_2.17.09.18.csv",
+#            "ATS_1.24.09.18.csv",
+#            "ATS_2.01.10.18.csv",
+#            "ATS_1.08.10.18.csv",
+#            "ATS_2.15.10.18.csv",
+#            "ATS_1.22.10.18.csv")
+# 
+# chemfile <- paste0(ssdir, "ATS Treatment.xlsx")
 
-    if(is.na(wind[1])) {
-        wind <- c(1, row_ct)
-    }
-
-    if(text) {
-        cat(paste0(fn, ": ", nrow(tb), " ", "observations\n"))
-    }
-    
-    if(view) {
-        par(mfrow=c(1,2))
-        
-        plot(x=tb[wind[1]:wind[2],]$datetime,
-             y=tb[wind[1]:wind[2],]$lux,
-             type="l",
-             main=paste0("lux ", fn),
-             xlab="Date",
-             ylab="Lux")
-        
-        abline(v=c(tb[trim[1],]$datetime,
-                   tb[trim[2],]$datetime),
-               col=c("blue", "blue"),
-               lty=c(1, 1),
-               lwd=c(1, 1))
-        
-        plot(x=tb[wind[1]:wind[2],]$datetime,
-             y=tb[wind[1]:wind[2],]$temp,
-             type="l",
-             main=paste0("temp ", fn),
-             xlab="Date",
-             ylab="Temperature")
-        
-        abline(v=c(tb[trim[1],]$datetime,
-                   tb[trim[2],]$datetime),
-               col=c("blue", "blue"),
-               lty=c(1, 1),
-               lwd=c(1, 1))
-        
-    }
-    
-    if(!is.na(week)) {
-        tb$week <- week
-    }
-    
-    if(ret) {
-        return(tb[trim[1]:trim[2],])
-    }
-}
-
-CleanHOBOData <- function(fn, l, r, w) {
-    tb <- HOBOData(fn, view=FALSE, ret=TRUE, week=w)
-    row_ct <- nrow(tb)
-    HOBOData(fn, trim=c(l, r))
-    HOBOData(fn, trim=c(l, r), wind=c(l-50, l+50))
-    HOBOData(fn, trim=c(l, r), wind=c(row_ct-r-50, row_ct-r+50))
-    return(tb[l:(row_ct-r),])
-}
-
-csvfiles <- c("ATS_1.11.09.18.csv",
-           "ATS_2.17.09.18.csv",
-           "ATS_1.24.09.18.csv",
-           "ATS_2.01.10.18.csv",
-           "ATS_1.08.10.18.csv",
-           "ATS_2.15.10.18.csv",
-           "ATS_1.22.10.18.csv")
-
-chemfile <- paste0(ssdir, "ATS Treatment.xlsx")
+# Data Dictionary
 ```
 # Introduction  
 Forshungzentrum-Jülich's (FZ-J) IBG-2 Alternative Biomass group installed a pilot
-algal turf scrubber (ATS) at its campus wastewater treatment plant (WWTP) in mid-August
+algal turf scrubber (ATS) at FZ-J's campus wastewater treatment plant (WWTP) in mid-August
 of 2018. This facility comprised a dump bucket and floway with approximately 1m^2^
 algal growth area, and recirculated 500 L of secondary treated sewage for periods
 of 24 hr (Monday through Thursday) and 96 hr (Thursday through Sunday). Beginning
-in early September, the facility was harvested weekly, and elementary water chemistry,
+in early September, algal biomass was harvested weekly, and water chemistry,
 illumination, temperature, and biomass productivity data were collected. The facility
 was removed from the WWTP at the end of September. This document describes the data
 collection for this pilot project and summarizes the results.  
 
-## Temperature and Illumination Data Logging  
-Two HOBO data loggers (ATS_1 and ATS_2) were used to gather temperature and illumination
-data, with one observation recorded per minute. Each week one logger was active, installed in the floway,
-while the other logger was idle. Prior to weekly harvest, the idle logger was initialized and was then used to replace
-the active logger after harvest. Data was then downloaded from the prior week's active logger.
-Each data file was processed using the HOBOware software, to export csv files containing
-temperature and illumination data.
+# Data Collection  
 
-## Temperature and Illumination Data Cleaning
-The data from each HOBO csv file was plotted and visually inspected to determine which observations
-reflected either the interval between initialization and installation in the floway, or the interval between
-removing the logger and downloading its data. The results of this analysis are shown in the Figures
-section of this document, with blue vertical lines enclosing the window of valid observations. Each
-complete plot is followed my magnifications of each cutoff region. In general it was obvious from temperature and/or illumination readings which were the critical observations. During the data cleaning process, the cleaned data
-is accumulated into a single data frame and then saved.
+## Temperature and Illumination  
+Two HOBO data loggers, ATS_1 and ATS_2, (Onset Computer Corporation, Bourne, MA, USA),
+were used to gather temperature in degrees Celsius and illumination in lux, with
+one observation recorded per minute. Each week one logger was installed in the floway,
+while the other logger was idle. Prior to biomass harvest, the idle logger was initialized
+and was then used to replace the active logger after harvest. Data was downloaded
+and processed using HOBOware 3.7.15 (Onset Computer Corporation, Bourne, MA, USA),
+to export csv files containing the temperature and illumination readings.
+temperature and illumination data. The csv files were analyzed in R 3.4.2 using RStudio 1.0.143.
+
+The data from each HOBO csv file was cleaned by plotting and visual inspection to determine which observations
+reflected the residence time within the floway. The results of this analysis are shown in Figures 1-7. Each
+weekly plot is followed by magnifications of each cutoff region. In general it was obvious from temperature and/or illumination readings which were the bracketing readings. During the data cleaning process, readings
+were accumulated into a single data frame and exported to the file `FZJATSPilot.csv`.
+
+## Water Chemistry and Biomass  
+Total nitrogen and $\mathrm{PO}_4$ phosphate determinations were performed on daily samples taken
+before and after water exchange. Starting 
 
 # Data Analaysis
 
@@ -280,7 +293,7 @@ which itself we assume is a function of temperature and illumination. We first
 integrate these observations for each nutrient assay interval by converting degrees
 Celsius to degrees Kelvin, summing the temperatures and illumination readings for each
 interval to obtain values for "degree minutes" (DM) and "lux minutes" (LM). For each interval
-we then multiply DM x LM and plot these values against nutrient removal for that interval.
+we then multiply DM $\times$ LM and plot these values against nutrient removal for that interval.
 
 ```{r DMLM}
 # A global list of unique dates of nutrient assays
@@ -384,14 +397,63 @@ kable(assay_df)
 # Create a data frame without the duplicate dates
 assay_df <- fw_df[-c(nf_before[both_before_nf],nf_after[both_after_nf]),]
 
-# Create a data frame for deltas between before/after
+# Create a data frame for deltas between before/after using all data
 before_df <- assay_df %>%
     filter(before == TRUE) %>%
-    select(datetime, PO4P, TN, pH)
+    select(obsdate, PO4P, TN, pH)
 
 after_df <- assay_df %>%
     filter(before == FALSE) %>%
-    select(datetime, PO4P, TN, pH)
-```
+    select(obsdate, PO4P, TN, pH)
 
-```{r NutrientData}
+Ndelta_df <- data.frame(obsdate = after_df[2:nrow(after_df),]$obsdate)
+Ndelta_df$delta <- after_df[2:nrow(after_df),]$TN - before_df[1:nrow(before_df),]$TN
+
+Pdelta_df <- data.frame(obsdate = after_df[2:nrow(after_df),]$obsdate)
+Pdelta_df$delta <- after_df[2:nrow(after_df),]$PO4P - before_df[1:nrow(before_df),]$PO4P
+
+pH_before <- which(!is.na(before_df$pH))
+pH_after <- which(!is.na(after_df$pH))
+pHdelta_df <- after_df[pH_after[(2:length(pH_after))],]$pH - before_df[pH_before,]$pH
+
+# Numbers of days of treatment per assay (1st observation gets NA)
+obsdays <- Ndelta_df$obsdate
+obsdays <- c(NA, (obsdays[2:length(obsdays)] - obsdays[1:(length(obsdays)-1)]))
+
+# Which observations had 1 or 4 days in between
+obs1day <- which(obsdays == 1)
+obs4day <- which(obsdays == 4)
+
+# Observations with 1 day between observations
+N1_df <- Ndelta_df[obs1day,]
+P1_df <- Pdelta_df[obs1day,]
+
+# Observations with 4 days between observations
+N4_df <- Ndelta_df[obs4day,]
+P4_df <- Pdelta_df[obs4day,]
+
+# Correlations among all readings
+Ncor_temp <- cor(Ndelta_df$delta, obs_df$temps)
+Ncor_lux <- cor(Ndelta_df$delta, obs_df$lux)
+
+Pcor_temp <- cor(Pdelta_df$delta, obs_df$temps)
+Pcor_lux <- cor(Pdelta_df$delta, obs_df$lux)
+
+Ncor_tl <- cor(Ndelta_df$delta, obs_df$temps * obs_df$luxs)
+Pcor_tl <- cor(Pdelta_df$delta, obs_df$temps * obs_df$luxs)
+```
+### Total Nitrogen  
+
+### PO4 Phosphate
+
+### pH   
+
+### Biomass
+Algal biomass grows by
+
+# Recommendations  
+The FZ-J WWTP Pilot successfully demonstrated highly effective ATS treatment of secondary sewage, reducing
+
+# Acknowledgements  
+The authors would like to thank Christina Kuchendorf, Marian Roeb, and Philipp Norf for invaluable
+assistance during this project.
