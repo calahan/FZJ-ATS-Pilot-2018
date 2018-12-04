@@ -7,4 +7,6 @@
 *.pdf
 *.xls
 *.xlsx
+Visual Elements/*
+Documents/*
 FZJATSPilot.csv
