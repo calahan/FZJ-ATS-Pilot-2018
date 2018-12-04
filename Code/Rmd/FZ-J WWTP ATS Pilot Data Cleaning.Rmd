@@ -1,6 +1,6 @@
 ---
 title: 'FZ-J WWTP ATS Pilot'
-subtitle: 'Data Analysis'
+subtitle: 'Data Cleaning'
 author:
 - Dean Calahan^[Smithsonian Institution]
 - Isabel Meuser^[Forschungszentrum Jülich]
@@ -23,124 +23,11 @@ source("Code/R/Settings.R")
 source("Code/R/FZJWWTPP.R")
 ```
 
-```{r Code}
-# HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), wind=c(NA, NA), view=TRUE, text=FALSE, ret=FALSE, week=NA) {
-# #
-# # i:
-# # fn        Name of the HOBO csv file to load
-# # trim      Number of observations to remove from beginning and end of data
-# # wind      Beginning and end indices of data to plot (if view==TRUE)
-# # view      Whether to plot the data
-# # text      Whether to display text with count of observations in the csv file
-# # ret       Whether to return the trimmed dataset
-# # week      Which week is represented by this file
-# #
-# # o:        If requested, a tibble containing the HOBO data from the specified file, with first
-# #           and last data elided.
-# #
-# # s:        A plot is generated if requested, displaying the data within the specified window
-# #
-#     tb <- read_csv(paste0(csvdir, fn), skip=2, col_names=c(
-#         "id",
-#         "date",
-#         "time",
-#         "tmp",
-#         "lx")) %>% transmute(
-#             datetime = make_datetime(year(mdy(date)),
-#                                      month(mdy(date)),
-#                                      day(mdy(date)),
-#                                      hour(time),
-#                                      minute(time),
-#                                      second(time),
-#                                      tz=zone),
-#             temp=tmp,
-#             lux=lx
-#         )
-#     
-#     row_ct <- nrow(tb)
-#     
-#     # Adjust trim[2] to reflect actual index, not number of observations to remove
-#     if(is.na(trim[1])) {
-#         trim <- c(0, row_ct)
-#     } else {
-#     trim <- c(trim[1], row_ct - trim[2])
-#     }
-# 
-#     if(is.na(wind[1])) {
-#         wind <- c(1, row_ct)
-#     }
-# 
-#     if(text) {
-#         cat(paste0(fn, ": ", nrow(tb), " ", "observations\n"))
-#     }
-#     
-#     if(view) {
-#         par(mfrow=c(1,2))
-#         
-#         plot(x=tb[wind[1]:wind[2],]$datetime,
-#              y=tb[wind[1]:wind[2],]$lux,
-#              type="l",
-#              main=paste0("lux ", fn),
-#              xlab="Date",
-#              ylab="Lux")
-#         
-#         abline(v=c(tb[trim[1],]$datetime,
-#                    tb[trim[2],]$datetime),
-#                col=c("blue", "blue"),
-#                lty=c(1, 1),
-#                lwd=c(1, 1))
-#         
-#         plot(x=tb[wind[1]:wind[2],]$datetime,
-#              y=tb[wind[1]:wind[2],]$temp,
-#              type="l",
-#              main=paste0("temp ", fn),
-#              xlab="Date",
-#              ylab="Temperature")
-#         
-#         abline(v=c(tb[trim[1],]$datetime,
-#                    tb[trim[2],]$datetime),
-#                col=c("blue", "blue"),
-#                lty=c(1, 1),
-#                lwd=c(1, 1))
-#         
-#     }
-#     
-#     if(!is.na(week)) {
-#         tb$week <- week
-#     }
-#     
-#     if(ret) {
-#         return(tb[trim[1]:trim[2],])
-#     }
-# }
-# 
-# CleanHOBOData <- function(fn, l, r, w) {
-#     tb <- HOBOData(fn, view=FALSE, ret=TRUE, week=w)
-#     row_ct <- nrow(tb)
-#     HOBOData(fn, trim=c(l, r))
-#     HOBOData(fn, trim=c(l, r), wind=c(l-50, l+50))
-#     HOBOData(fn, trim=c(l, r), wind=c(row_ct-r-50, row_ct-r+50))
-#     return(tb[l:(row_ct-r),])
-# }
-# 
-# # File names
-# csvfiles <- c("ATS_1.11.09.18.csv",
-#            "ATS_2.17.09.18.csv",
-#            "ATS_1.24.09.18.csv",
-#            "ATS_2.01.10.18.csv",
-#            "ATS_1.08.10.18.csv",
-#            "ATS_2.15.10.18.csv",
-#            "ATS_1.22.10.18.csv")
-# 
-# chemfile <- paste0(ssdir, "ATS Treatment.xlsx")
-
-# Data Dictionary
-```
 # Introduction  
 Forshungzentrum-Jülich's (FZ-J) IBG-2 Alternative Biomass group installed a pilot
 algal turf scrubber (ATS) at FZ-J's campus wastewater treatment plant (WWTP) in mid-August
 of 2018. This facility comprised a dump bucket and floway with approximately 1m^2^
-algal growth area, and recirculated 500 L of secondary treated sewage for periods
+algal growth area, and recirculated 500 L of secondary treated sewage for intervals
 of 24 hr (Monday through Thursday) and 96 hr (Thursday through Sunday). Beginning
 in early September, algal biomass was harvested weekly, and water chemistry,
 illumination, temperature, and biomass productivity data were collected. The facility
@@ -150,27 +37,37 @@ collection for this pilot project and summarizes the results.
 # Data Collection  
 
 ## Temperature and Illumination  
-Two HOBO data loggers, ATS_1 and ATS_2, (Onset Computer Corporation, Bourne, MA, USA),
-were used to gather temperature in degrees Celsius and illumination in lux, with
-one observation recorded per minute. Each week one logger was installed in the floway,
-while the other logger was idle. Prior to biomass harvest, the idle logger was initialized
-and was then used to replace the active logger after harvest. Data was downloaded
-and processed using HOBOware 3.7.15 (Onset Computer Corporation, Bourne, MA, USA),
-to export csv files containing the temperature and illumination readings.
-temperature and illumination data. The csv files were analyzed in R 3.4.2 using RStudio 1.0.143.
+Two HOBO data loggers, ATS_1 and ATS_2, (Onset Computer Corporation, Bourne, MA,
+USA), were used to gather temperature data in degrees Celsius and illumination data
+in lux, with one observation recorded each minute. Each week one logger was installed
+in the floway, while the other logger was idle. Prior to biomass harvest, the idle
+logger was initialized used to replace the previously active logger after harvest.
+Data was downloaded and processed using HOBOware 3.7.15 (Onset Computer Corporation,
+Bourne, MA, USA), to export `csv` files containing the temperature and illumination
+readings. The `csv` files were analyzed in R 3.4.2 using RStudio 1.0.143.
 
-The data from each HOBO csv file was cleaned by plotting and visual inspection to determine which observations
-reflected the residence time within the floway. The results of this analysis are shown in Figures 1-7. Each
-weekly plot is followed by magnifications of each cutoff region. In general it was obvious from temperature and/or illumination readings which were the bracketing readings. During the data cleaning process, readings
-were accumulated into a single data frame and exported to the file `FZJATSPilot.csv`.
+The data from each `csv` file (Table 1) was cleaned by plotting and visual inspection to determine
+which observations referred to the logger's residence time within the floway. Results
+of this analysis are shown in Figures 1-7. Each weekly plot (panel A) is followed
+by magnifications of each cutoff region (panels B and C). In general it was obvious
+from temperature and/or illumination readings which were the relevant readings.
+Irrelevant readings were discarded and the remaining readings were aggregated into
+a single data frame and exported to the file `FZJATSPilot.csv`.
 
 ## Water Chemistry and Biomass  
 Total nitrogen and $\mathrm{PO}_4$ phosphate determinations were performed on daily samples taken
-before and after water exchange. Starting 
+before and after water exchange. Samples not assayed on the day they were taken were frozen and
+assayed later. On two occasions, samples were assayed both on the day they were taken and
+after freezing (Table 2). As the differences between the readings for frozen and unfrozen samples
+was smalls
 
 # Data Analaysis
 
 # Figures  
+```{r, out.width=300, echo=FALSE}
+knitr::include_graphics("http://apod.nasa.gov/apod/image/1302/ringshexagon_cass
+ini_1016.jpg")
+```
 ### Temperature and Illumination, Week 1 (ATS_1)  
 ```{r week1}
 ti_df <- CleanHOBOData(csvfiles[1], 1010, 365, w=1)
@@ -451,9 +348,20 @@ Pcor_tl <- cor(Pdelta_df$delta, obs_df$temps * obs_df$luxs)
 ### Biomass
 Algal biomass grows by
 
-# Recommendations  
+# Conclusions  
 The FZ-J WWTP Pilot successfully demonstrated highly effective ATS treatment of secondary sewage, reducing
 
 # Acknowledgements  
 The authors would like to thank Christina Kuchendorf, Marian Roeb, and Philipp Norf for invaluable
 assistance during this project.
+
+# Tables
+```{r Table1}
+#kable(file)
+```
+# Figures
+
+```{r, out.width=300, echo=FALSE}
+knitr::include_graphics("http://apod.nasa.gov/apod/image/1302/ringshexagon_cass
+ini_1016.jpg")
+```
