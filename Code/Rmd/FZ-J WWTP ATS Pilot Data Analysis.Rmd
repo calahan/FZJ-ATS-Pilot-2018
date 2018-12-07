@@ -62,128 +62,13 @@ after freezing (Table 2). As the differences between the readings for frozen and
 was smalls
 
 # Data Analaysis
-
+```{r loaddata}
+ti_tb <- read_csv(ti_fn)
+wqb_tb <- read_csv(wqb_fn)
+```
 # Figures  
-```{r, out.width=300, echo=FALSE}
-knitr::include_graphics("http://apod.nasa.gov/apod/image/1302/ringshexagon_cass
-ini_1016.jpg")
-```
-### Temperature and Illumination, Week 1 (ATS_1)  
-```{r week1}
-ti_df <- CleanHOBOData(csvfiles[1], 1010, 365, w=1)
-```
 
-### Temperature and Illumination, Week 2 (ATS_2)  
-```{r week2}
-ti_df <- ti_df %>% rbind(CleanHOBOData(csvfiles[2], 9773, 271, w=2))
-```
-
-### Temperature and Illumination, Week 3 (ATS_1)  
-```{r week3}
-ti_df <- ti_df %>% rbind(CleanHOBOData(csvfiles[3], 119, 96, w=3))
-```
-
-### Temperature and Illumination, Week 4 (ATS_2)  
-```{r week4}
-ti_df <- ti_df %>% rbind(CleanHOBOData(csvfiles[4], 107, 227, w=4))
-```
-
-### Temperature and Illumination, Week 5 (ATS_1)  
-```{r week5}
-ti_df <- ti_df %>% rbind(CleanHOBOData(csvfiles[5], 107, 227, w=5))
-```
-
-### Temperature and Illumination, Week 6 (ATS_2)  
-```{r week6}
-ti_df <- ti_df %>% rbind(CleanHOBOData(csvfiles[6], 121, 65, w=6))
-```
-
-### Temperature and Illumination, Week 7 (ATS_1)  
-```{r week7}
-ti_df <- ti_df %>% rbind(CleanHOBOData(csvfiles[7], 84, 54, w=7))
-write_csv(ti_df, paste0(datadir, "FZJATSPilot.csv"))
-```
-
-# Floway Chemistry & Biomass
-```{r Floway}
-wc_df <- read_excel(chemfile,
-                    sheet="Tabelle1",
-                    skip=3,
-                    col_names=c("date",
-                               "time",
-                               "beforeafter",
-                               "PO4dil",
-                               "PO4P",
-                               "PO4Pxdil",
-                               "PO4Pred",
-                               "dilTN",
-                               "TNxdil",
-                               "TN",
-                               "TNred",
-                               "comment",
-                               "remark",
-                               "assaydate",
-                               "bmwet",
-                               "bmdry",
-                               "bmdrypct",
-                               "pH"))
-
-# Impute missing times. We take the minimum time, and simply add 24 hours to it
-no_times <- which(is.na(wc_df$time))
-min_time <- min(ti_df[ti_df$week == 1,]$datetime)
-wc_df[which(is.na(wc_df$time)),]$time <- make_datetime(2018,
-                                                       12,
-                                                       31,
-                                                       8,
-                                                       0,
-                                                       0)
-
-# Create a new data frame with date and time combined into datetime for each observation
-fw_df <- data.frame(datetime=make_datetime(year(wc_df$date),
-                                           month(wc_df$date),
-                                           day(wc_df$date),
-                                           hour(wc_df$time),
-                                           minute(wc_df$time),
-                                           second(wc_df$time),
-                                           tz="Europe/Berlin"))
-
-# Make before/after a logical
-fw_df$before <- TRUE
-fw_df[which(wc_df$beforeafter != "before"),]$before <- FALSE
-
-# Nutrient concentrations & pH
-fw_df$PO4P <- wc_df$PO4Pxdil
-fw_df$TN <- wc_df$TN
-fw_df$pH <- wc_df$pH
-
-# Make frozen/not frozen a logical
-fw_df$frozen <- TRUE
-fw_df[which(wc_df$comment != "frozen"),]$frozen <- FALSE
-
-# Date of assay
-fw_df$assaydate <- make_date(year(wc_df$assaydate),
-                                 month(wc_df$assaydate),
-                                 day(wc_df$assaydate))
-
-# Add a week number corresponding to ti_df
-# week_num_dates <- function(x) {
-#     t <- unique(make_date(year(ti_df[ti_df$week == x,]$datetime),
-#                      month(ti_df[ti_df$week == x,]$datetime),
-#                      day(ti_df[ti_df$week == x,]$datetime)))
-#     return(c(min(t), max(t)))
-# }
-# t <- week_num_dates(1)
-# which(fw_df$datetime >= t[1] & fw_df$datetime <= t[2])
-
-# Biomass measurements
-fw_df$wet_biomass <- wc_df$bmwet
-fw_df$dry_biomass <- wc_df$bmdry
-fw_df$solids <- wc_df$bmdrypct
-
-# Need observation date separately to make life easier
-fw_df$obsdate <- make_date(year(fw_df$datetime), month(fw_df$datetime), day(fw_df$datetime))
-```
-
+![Figure 1](../../Figures/Figure1.png)
 ## Correlation of nutrient removal with temperature and illumination.  
 We initially assume that nutrient removal is a function of algal metabolic activity,
 which itself we assume is a function of temperature and illumination. We first
@@ -194,49 +79,10 @@ we then multiply DM $\times$ LM and plot these values against nutrient removal f
 
 ```{r DMLM}
 # A global list of unique dates of nutrient assays
-nutdates <- sort(unique(make_date(year(fw_df$datetime), month(fw_df$datetime), day(fw_df$datetime))))
-
-IntegrateObs <- function(day, diag=FALSE) {
-#
-# i:    startdate
-#
-# o:    The number of degree minutes between the observation time of the given start date
-#       and the next observation time
-#
-# g:    
-#
-    # Day 1 is an error because there was no previous sample
-    if(day == 1) {
-        stop("Day 1 illegal")
-    }
-    
-    # If day is larger than number of observations, it is an error
-    if(day > length(nutdates)) {
-        stop("Day too large")
-    }
-    
-    # What are the bracketing datetimes
-    t2 <- min(fw_df[which(year(fw_df$datetime) == year(nutdates[day]) &
-                         month(fw_df$datetime) == month(nutdates[day]) &
-                         day(fw_df$datetime) == day(nutdates[day])),]$datetime)
-    
-    t1 <- min(fw_df[which(year(fw_df$datetime) == year(nutdates[day-1]) &
-                         month(fw_df$datetime) == month(nutdates[day-1]) &
-                         day(fw_df$datetime) == day(nutdates[day-1])),]$datetime)
-    
-    # What are the temperature and lux measurements between these brackets?
-    temps <- ti_df[ti_df$datetime >= t1 & ti_df$datetime < t2,]$temp + C2K
-    luxs <-  ti_df[ti_df$datetime >= t1 & ti_df$datetime < t2,]$lux
-    
-    if(diag) {
-        cat(paste0("Number of observations: ", length(temps), "\n"))
-    }
-    
-    return(c(sum(temps), sum(luxs)))
-}
-
-int_obs <- t(simplify2array(lapply(2:26, IntegrateObs)))
+nutdates <- sort(unique(make_date(year(wqb_tb$datetime), month(wqb_tb$datetime), day(wqb_tb$datetime))))
+int_obs <- t(simplify2array(lapply(2:26, IntegrateObs, wqb_tb, ti_tb)))
 obs_df <- data.frame(datetime=nutdates[2:26], temps=int_obs[,1], luxs=int_obs[,2])
+#par(mfrow=c(2,1))
 barplot(height=obs_df$temps, names.arg=obs_df$datetime)
 barplot(height=obs_df$lux, names.arg=obs_df$datetime)
 ```
@@ -249,29 +95,29 @@ Celsius to degrees Kelvin) approximate for each interval between N and P assays.
 # Which assays had results for both frozen and non-frozen samples?
 #
 # First get indices of before/after for frozen/nonfrozen samples
-nf_before <- which(fw_df$frozen == FALSE & fw_df$before == TRUE)
-nf_after <- which(fw_df$frozen == FALSE & fw_df$before == FALSE)
-f_before <- which(fw_df$frozen == TRUE & fw_df$before == TRUE)
-f_after <- which(fw_df$frozen == TRUE & fw_df$before == FALSE)
+nf_before <- which(wqb_tb$frozen == FALSE & wqb_tb$before == TRUE)
+nf_after <- which(wqb_tb$frozen == FALSE & wqb_tb$before == FALSE)
+f_before <- which(wqb_tb$frozen == TRUE & wqb_tb$before == TRUE)
+f_after <- which(wqb_tb$frozen == TRUE & wqb_tb$before == FALSE)
 
 # Then, for each assay that was frozen, was there a frozen assay for that date,
 # And for each assay that wasn't frozen, was there an unfrozen assay for that date
-both_before_nf <- fw_df[nf_before,]$obsdate %in% fw_df[f_before,]$obsdate
-both_after_nf <- fw_df[nf_after,]$obsdate %in% fw_df[f_after,]$obsdate
-both_before_f <- fw_df[f_before,]$obsdate %in% fw_df[nf_before,]$obsdate
-both_after_f <- fw_df[f_after,]$obsdate %in% fw_df[nf_after,]$obsdate
+both_before_nf <- wqb_tb[nf_before,]$obsdate %in% wqb_tb[f_before,]$obsdate
+both_after_nf <- wqb_tb[nf_after,]$obsdate %in% wqb_tb[f_after,]$obsdate
+both_before_f <- wqb_tb[f_before,]$obsdate %in% wqb_tb[nf_before,]$obsdate
+both_after_f <- wqb_tb[f_after,]$obsdate %in% wqb_tb[nf_after,]$obsdate
 
 # What are the dates for all those
-nf_before_dates <- fw_df[nf_before[both_before_nf],]$obsdate
-# nf_after_dates <- fw_df[nf_after[both_after_nf],]$obsdate
-# f_before_dates <- fw_df[f_before[both_before_f],]$obsdate
-# f_after_dates <- fw_df[f_after[both_after_f],]$obsdate
+nf_before_dates <- wqb_tb[nf_before[both_before_nf],]$obsdate
+# nf_after_dates <- wqb_tb[nf_after[both_after_nf],]$obsdate
+# f_before_dates <- wqb_tb[f_before[both_before_f],]$obsdate
+# f_after_dates <- wqb_tb[f_after[both_after_f],]$obsdate
 
 # What are the differences between the measurements
-N_nf_before <- fw_df[nf_before[both_before_nf],]$TN
-N_f_before <- fw_df[f_before[both_before_f],]$TN
-P_nf_before <- fw_df[nf_before[both_before_nf],]$PO4P
-P_f_before <- fw_df[f_before[both_before_f],]$PO4P
+N_nf_before <- wqb_tb[nf_before[both_before_nf],]$TN
+N_f_before <- wqb_tb[f_before[both_before_f],]$TN
+P_nf_before <- wqb_tb[nf_before[both_before_nf],]$PO4P
+P_f_before <- wqb_tb[f_before[both_before_f],]$PO4P
 
 N_rat <- (N_nf_before - N_f_before) / N_nf_before
 P_rat <- (P_nf_before - P_f_before) / P_nf_before
@@ -284,15 +130,15 @@ samples were frozen and accumulated and assayed in batches.
 
 ```{r NutrientAssays}
 # Create a table for displaying dates of assays
-assay_df <- data.frame(obsdate = fw_df$obsdate,
-                       frozen = fw_df$frozen,
-                       assaydate = fw_df$assaydate,
-                       daysfrozen = as.integer(fw_df$assaydate - fw_df$obsdate))
+assay_df <- data.frame(obsdate = wqb_tb$obsdate,
+                       frozen = wqb_tb$frozen,
+                       assaydate = wqb_tb$assaydate,
+                       daysfrozen = as.integer(wqb_tb$assaydate - wqb_tb$obsdate))
 
 kable(assay_df)
 
 # Create a data frame without the duplicate dates
-assay_df <- fw_df[-c(nf_before[both_before_nf],nf_after[both_after_nf]),]
+assay_df <- wqb_tb[-c(nf_before[both_before_nf],nf_after[both_after_nf]),]
 
 # Create a data frame for deltas between before/after using all data
 before_df <- assay_df %>%
@@ -333,6 +179,38 @@ P4_df <- Pdelta_df[obs4day,]
 Ncor_temp <- cor(Ndelta_df$delta, obs_df$temps)
 Ncor_lux <- cor(Ndelta_df$delta, obs_df$lux)
 
+#dev.off()
+#par(mfrow=c(1,1))
+# 1 day readings (temp)
+Ncor_df <- data.frame(temp=obs_df$temps, removal=-Ndelta_df$delta)
+Ncor_df <- Ncor_df[order(Ncor_df$temp, decreasing=TRUE),]
+Ncor1_df <- Ncor_df[Ncor_df$temp < 600000 & Ncor_df$temp > 410000,]
+plot(Ncor1_df$temp, Ncor1_df$removal)
+abline(lm(Ncor1_df$removal~Ncor1_df$temp))
+
+Pcor_df <- data.frame(temp=obs_df$temps, removal=-Pdelta_df$delta)
+Pcor_df <- Pcor_df[order(Pcor_df$temp, decreasing=TRUE),]
+Pcor1_df <- Pcor_df[Pcor_df$temp < 600000 & Pcor_df$temp > 415000,]
+#Pcor1_df <- Pcor_df
+plot(Pcor1_df$temp, Pcor1_df$removal)
+abline(lm(Pcor1_df$removal~Pcor1_df$temp))
+
+# 1 day readings (lux)
+Ncor_df <- data.frame(lux=obs_df$luxs, removal=-Ndelta_df$delta)
+Ncor_df <- Ncor_df[order(Ncor_df$lux, decreasing=TRUE),]
+#Ncor1_df <- Ncor_df[Ncor_df$lux < 600000 & Ncor_df$lux > 410000,]
+Ncor1_df <- Ncor_df
+plot(Ncor1_df$lux, Ncor1_df$removal)
+abline(lm(Ncor1_df$removal~Ncor1_df$lux))
+
+Pcor_df <- data.frame(lux=obs_df$luxs, removal=-Pdelta_df$delta)
+Pcor_df <- Pcor_df[order(Pcor_df$lux, decreasing=TRUE),]
+#Pcor1_df <- Pcor_df[Pcor_df$temp < 600000 & Pcor_df$temp > 415000,]
+Pcor1_df <- Pcor_df
+plot(Pcor1_df$lux, Pcor1_df$removal)
+abline(lm(Pcor1_df$removal~Pcor1_df$lux))
+# # # #
+
 Pcor_temp <- cor(Pdelta_df$delta, obs_df$temps)
 Pcor_lux <- cor(Pdelta_df$delta, obs_df$lux)
 
@@ -360,8 +238,3 @@ assistance during this project.
 #kable(file)
 ```
 # Figures
-
-```{r, out.width=300, echo=FALSE}
-knitr::include_graphics("http://apod.nasa.gov/apod/image/1302/ringshexagon_cass
-ini_1016.jpg")
-```

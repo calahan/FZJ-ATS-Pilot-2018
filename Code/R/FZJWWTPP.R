@@ -114,10 +114,10 @@ CleanHOBOData <- function(fn, l, r, w) {
     return(tb[l:(row_ct-r),])
 }
 
-IntegrateObs <- function(day, diag=FALSE) {
+IntegrateObs <- function(d, df1, df2, diag=FALSE) {
 #
 # i:
-# day   the observation date
+# d   the observation date
 # diag  whether to print diagnostic information
 #
 # v:
@@ -125,27 +125,27 @@ IntegrateObs <- function(day, diag=FALSE) {
 # first observation time of the previous day.
 #
     # Day 1 is an error because there was no previous sample
-    if(day == 1) {
+    if(d == 1) {
         stop("Day 1 illegal")
     }
 
-    # If day is larger than number of observations, it is an error
-    if(day > length(nutdates)) {
+    # If d is larger than number of observations, it is an error
+    if(d > length(nutdates)) {
         stop("Day too large")
     }
 
     # What are the bracketing datetimes
-    t2 <- min(fw_df[which(year(fw_df$datetime) == year(nutdates[day]) &
-                              month(fw_df$datetime) == month(nutdates[day]) &
-                              day(fw_df$datetime) == day(nutdates[day])),]$datetime)
+    t2 <- min(df1[which(year(df1$datetime) == year(nutdates[d]) &
+                              month(df1$datetime) == month(nutdates[d]) &
+                              day(df1$datetime) == day(nutdates[d])),]$datetime)
 
-    t1 <- min(fw_df[which(year(fw_df$datetime) == year(nutdates[day-1]) &
-                              month(fw_df$datetime) == month(nutdates[day-1]) &
-                              day(fw_df$datetime) == day(nutdates[day-1])),]$datetime)
+    t1 <- min(df1[which(year(df1$datetime) == year(nutdates[d-1]) &
+                              month(df1$datetime) == month(nutdates[d-1]) &
+                              day(df1$datetime) == day(nutdates[d-1])),]$datetime)
 
     # What are the temperature and lux measurements between these brackets?
-    temps <- ti_df[ti_df$datetime >= t1 & ti_df$datetime < t2,]$temp + C2K
-    luxs <-  ti_df[ti_df$datetime >= t1 & ti_df$datetime < t2,]$lux
+    temps <- df2[df2$datetime >= t1 & df2$datetime < t2,]$temp + C2K
+    luxs <-  df2[df2$datetime >= t1 & df2$datetime < t2,]$lux
 
     if(diag) {
         cat(paste0("Number of observations: ", length(temps), "\n"))

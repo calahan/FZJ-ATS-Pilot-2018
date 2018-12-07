@@ -18,6 +18,9 @@ HOBO_fn <- paste0(csv_dir, c("ATS_1.11.09.18.csv",
                             "ATS_2.15.10.18.csv",
                             "ATS_1.22.10.18.csv"))
 
+#fig_fn <- c("Visual Elements/Figures/Figure 1.png", "blah")
+fig_fn <- c("Figures/Figure1.png", "blah")
+
 # Spreadsheet of water chemistry and biomass observations
 ss_fn <- paste0(ss_dir, "ATS Treatment.xlsx")
 
