@@ -7,6 +7,9 @@
 *.pdf
 *.xls
 *.xlsx
+*.hobo
 Visual Elements/*
 Documents/*
 FZJATSPilot.csv
+Data/csv/FZJ WWTP ATS Pilot Chemistry and Biomass.csv
+Data/csv/FZJ WWTP ATS Pilot Temperature and Illumination.csv
