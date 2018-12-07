@@ -22,51 +22,93 @@ library(knitr)
 source("Code/R/Settings.R")
 source("Code/R/FZJWWTPP.R")
 ```
+# Introduction  
+Here we clean the data by reading the data files, manipulating the data to better
+organize it for analysis, then saving the reoragnized data as csv files. Temperature
+and illumination data were downloaded weekly from a HOBO data logger. Water quality and
+biomass data were entered manually into a spreadsheet.
 
-### Temperature and Illumination, Week 1 (ATS_1)  
-```{r week1}
+To clean the temperature and illumination data, each week's data file (`ATS_<#.dd.mm.yy>.hobo`)
+was converted csv using the Onset's HOBOware software (note that the files `*.hproj`
+contain metadata bout the `.hobo` files and were not processed). Because the data
+loggers were either initialized in an office before being transported to the floway
+for installation, or downloaded after being removed from the floway and taken to
+the office, the initial and final observations had to be discarded. Figures 1-7
+and the code that generated them show which observations were discarded. The remaining
+observations were combined into a single data set and saved as a csv file. To clean
+the water quality and biomass data, recorded manually in an Excel spreadsheet, the
+spreadsheet data were loaded and manipulated into a schema more useful for analysis
+before being saved as a csv file.
+
+# Temperature and Illumination  
+Each week's data is shown in several views, for both illumination and temperature.
+First the entire data set is shown, with vertical blue lines indicating either the
+earliest observation that was retained (right hand side) or the latest observation
+that was retained (left hand side). This global view is followed by a magnification
+of the early and late regions. The numbers in the function call that performs the
+data cleaning refer to how many observations are removed from the beginning and
+end of the data set, respectively.
+
+# Water Quality and Biomass Characteristics
+Some of the columns ("Dilution PO4-P", "PO4-P", "reduction", "Dilution TNb", "TNb",
+"remark"), were not retained in the cleaned data, while others (unnamed column with
+"before/after", "commend") were converted from text to logical for improved ease of
+analysis.
+
+\newpage
+## Week 1 (ATS_1)  
+```{r week1, echo = TRUE}
+# Create initial cleaned data set
 ti_df <- CleanHOBOData(HOBO_fn[1], 1010, 365, w=1)
 ```
 
-### Temperature and Illumination, Week 2 (ATS_2)  
-```{r week2}
+## Week 2 (ATS_2)  
+```{r week2, echo = TRUE}
+# Clean and append the next data set
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[2], 9773, 271, w=2))
 ```
 
-### Temperature and Illumination, Week 3 (ATS_1)  
-```{r week3}
+## Week 3 (ATS_1)  
+```{r week3, echo = TRUE}
+# Clean and append the next data set
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[3], 119, 96, w=3))
 ```
 
-### Temperature and Illumination, Week 4 (ATS_2)  
-```{r week4}
+## Week 4 (ATS_2)  
+```{r week4, echo = TRUE}
+# Clean and append the next data set
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[4], 107, 227, w=4))
 ```
 
-### Temperature and Illumination, Week 5 (ATS_1)  
-```{r week5}
+## Week 5 (ATS_1)  
+```{r week5, echo = TRUE}
+# Clean and append the next data set
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[5], 107, 227, w=5))
 ```
 
-### Temperature and Illumination, Week 6 (ATS_2)  
-```{r week6}
+## Week 6 (ATS_2)  
+```{r week6, echo = TRUE}
+# Clean and append the next data set
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[6], 121, 65, w=6))
 ```
 
-### Temperature and Illumination, Week 7 (ATS_1)  
-```{r week7}
+## Week 7 (ATS_1)  
+```{r week7, echo = TRUE}
+# Clean and append the next data set
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[7], 84, 54, w=7))
 ```
 ```{r save_ti}
+# Save the data set as a csv file
 write_csv(ti_df, ti_fn)
 ```
 
 # Floway Chemistry & Biomass
-```{r Floway}
-wc_df <- read_excel(ss_fn,
-                    sheet="Tabelle1",
-                    skip=3,
-                    col_names=c("date",
+```{r WaterQualityBiomass}
+# Load the data in the Excel spreadsheet into a temporary data frame
+t_df <- read_excel(ss_fn,
+                   sheet="Tabelle1",
+                   skip=3,
+                   col_names=c("date",
                                "time",
                                "beforeafter",
                                "PO4dil",
@@ -85,52 +127,52 @@ wc_df <- read_excel(ss_fn,
                                "bmdrypct",
                                "pH"))
 
-# Impute missing times. We take the minimum time, and simply add 24 hours to it
-no_times <- which(is.na(wc_df$time))
+# Impute missing times. We take the earliest time, and simply add 24 hours to it
+# [todo] Is this even used? There is something wrong here at any rate
+no_times <- which(is.na(t_df$time))
 min_time <- min(ti_df[ti_df$week == 1,]$datetime)
-wc_df[which(is.na(wc_df$time)),]$time <- make_datetime(2018,
-                                                       12,
-                                                       31,
-                                                       8,
-                                                       0,
-                                                       0)
+t_df[which(is.na(t_df$time)),]$time <- make_datetime(2018,
+                                                     12,
+                                                     31,
+                                                     8,
+                                                     0,
+                                                     0)
 
 # Create a new data frame with date and time combined into datetime for each observation
-fw_df <- data.frame(datetime=make_datetime(year(wc_df$date),
-                                           month(wc_df$date),
-                                           day(wc_df$date),
-                                           hour(wc_df$time),
-                                           minute(wc_df$time),
-                                           second(wc_df$time),
-                                           tz="Europe/Berlin"))
+wqb_df <- data.frame(datetime=make_datetime(year(t_df$date),
+                                            month(t_df$date),
+                                            day(t_df$date),
+                                            hour(t_df$time),
+                                            minute(t_df$time),
+                                            second(t_df$time),
+                                            tz="Europe/Berlin"))
 
 # Make before/after a logical
-fw_df$before <- TRUE
-fw_df[which(wc_df$beforeafter != "before"),]$before <- FALSE
+wqb_df$before <- TRUE
+wqb_df[which(t_df$beforeafter != "before"),]$before <- FALSE
 
 # Nutrient concentrations & pH
-fw_df$PO4P <- wc_df$PO4Pxdil
-fw_df$TN <- wc_df$TN
-fw_df$pH <- wc_df$pH
+wqb_df$PO4P <- t_df$PO4Pxdil
+wqb_df$TN <- t_df$TN
+wqb_df$pH <- t_df$pH
 
 # Make frozen/not frozen a logical
-fw_df$frozen <- TRUE
-fw_df[which(wc_df$comment != "frozen"),]$frozen <- FALSE
+wqb_df$frozen <- TRUE
+wqb_df[which(t_df$comment != "frozen"),]$frozen <- FALSE
 
 # Date of assay
-fw_df$assaydate <- make_date(year(wc_df$assaydate),
-                                 month(wc_df$assaydate),
-                                 day(wc_df$assaydate))
+wqb_df$assaydate <- make_date(year(t_df$assaydate),
+                              month(t_df$assaydate),
+                              day(t_df$assaydate))
 
 # Biomass measurements
-fw_df$wet_biomass <- wc_df$bmwet
-fw_df$dry_biomass <- wc_df$bmdry
-fw_df$solids <- wc_df$bmdrypct
+wqb_df$wet_biomass <- t_df$bmwet
+wqb_df$dry_biomass <- t_df$bmdry
+wqb_df$solids <- t_df$bmdrypct
 
 # Need observation date separate from datetime to make life easier
-fw_df$obsdate <- make_date(year(fw_df$datetime), month(fw_df$datetime), day(fw_df$datetime))
-
+wqb_df$obsdate <- make_date(year(wqb_df$datetime), month(wqb_df$datetime), day(wqb_df$datetime))
 ```
 ```{r save_cb}
-write_csv(fw_df, cb_fn)
+write_csv(wqb_df, wqb_fn)
 ```

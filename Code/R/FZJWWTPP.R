@@ -51,6 +51,7 @@ HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), wind=c(NA, NA), v
 
     if(view) {
         par(mfrow=c(1,2))
+        par(ps = 12, cex = 1, cex.main = 1)
 
         plot(x=tb[wind[1]:wind[2],]$datetime,
              y=tb[wind[1]:wind[2],]$lux,
