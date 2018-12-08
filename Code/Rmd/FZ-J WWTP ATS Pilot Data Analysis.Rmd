@@ -2,7 +2,7 @@
 title: 'FZ-J WWTP ATS Pilot'
 subtitle: 'Data Analysis'
 author:
-- Dean Calahan^[Smithsonian Institution]
+- Dean Calahan^[Smithsonian Institution, Forschungszentrum Jülich (visiting)]
 - Isabel Meuser^[Forschungszentrum Jülich]
 - Ladislav Nedbal^[Forschungszentrum Jülich]
 date: "`r format(Sys.time(), '%d %B, %Y')`"
@@ -22,7 +22,10 @@ library(knitr)
 source("Code/R/Settings.R")
 source("Code/R/FZJWWTPP.R")
 ```
-
+```{r loaddata}
+ti_tb <- read_csv(ti_fn)
+wqb_tb <- read_csv(wqb_fn)
+```
 # Introduction  
 Forshungzentrum-Jülich's (FZ-J) IBG-2 Alternative Biomass group installed a pilot
 algal turf scrubber (ATS) at FZ-J's campus wastewater treatment plant (WWTP) in mid-August
@@ -41,15 +44,14 @@ Two HOBO data loggers, ATS_1 and ATS_2, (Onset Computer Corporation, Bourne, MA,
 USA), were used to gather temperature data in degrees Celsius and illumination data
 in lux, with one observation recorded each minute. Each week one logger was installed
 in the floway, while the other logger was idle. Prior to biomass harvest, the idle
-logger was initialized used to replace the previously active logger after harvest.
+logger was initialized and used to replace the previously active logger after harvest.
 Data was downloaded and processed using HOBOware 3.7.15 (Onset Computer Corporation,
 Bourne, MA, USA), to export `csv` files containing the temperature and illumination
 readings. The `csv` files were analyzed in R 3.4.2 using RStudio 1.0.143.
 
-The data from each `csv` file (Table 1) was cleaned by plotting and visual inspection to determine
+The data from each `csv` file was cleaned by plotting and visual inspection to determine
 which observations referred to the logger's residence time within the floway. Results
-of this analysis are shown in Figures 1-7. Each weekly plot (panel A) is followed
-by magnifications of each cutoff region (panels B and C). In general it was obvious
+of this analysis are available in the file `FZ-J WWTP ATS Pilot Data Cleaning`. In general it was obvious
 from temperature and/or illumination readings which were the relevant readings.
 Irrelevant readings were discarded and the remaining readings were aggregated into
 a single data frame and exported to the file `FZJATSPilot.csv`.
@@ -61,14 +63,30 @@ assayed later. On two occasions, samples were assayed both on the day they were 
 after freezing (Table 2). As the differences between the readings for frozen and unfrozen samples
 was smalls
 
-# Data Analaysis
-```{r loaddata}
-ti_tb <- read_csv(ti_fn)
-wqb_tb <- read_csv(wqb_fn)
-```
-# Figures  
+### Total Nitrogen  
+Deviation from the sawtooth pattern
+Negative correlation on the 
 
-![Figure 1](../../Figures/Figure1.png)
+### PO4 Phosphate
+
+### pH   
+
+### Biomass
+Algal biomass grows by
+
+# Discussion
+
+# Conclusions  
+The FZ-J WWTP Pilot successfully demonstrated highly effective ATS treatment of secondary sewage, reducing
+
+# Acknowledgements  
+The authors would like to thank Christina Kuchendorf, Marian Roeb, and Philipp Norf
+for invaluable assistance during this project.
+
+## PO4 Phosphorus
+
+## Total Nitrogen
+
 ## Correlation of nutrient removal with temperature and illumination.  
 We initially assume that nutrient removal is a function of algal metabolic activity,
 which itself we assume is a function of temperature and illumination. We first
@@ -77,12 +95,24 @@ Celsius to degrees Kelvin, summing the temperatures and illumination readings fo
 interval to obtain values for "degree minutes" (DM) and "lux minutes" (LM). For each interval
 we then multiply DM $\times$ LM and plot these values against nutrient removal for that interval.
 
+## Biomass
+
+# Figures  
+
+
+![Figure 1](../../Figures/Figure1.png)
+Figure 1.  Pilot ATS floway at Forshungszentrum-Jülich's wastewater treatment plant. (A) View
+looking upslope towards headworks, with HOBO datalogger (inset) in foreground. (B) Side view
+of installation, with reservoir tank on the left.
+
 ```{r DMLM}
 # A global list of unique dates of nutrient assays
 nutdates <- sort(unique(make_date(year(wqb_tb$datetime), month(wqb_tb$datetime), day(wqb_tb$datetime))))
 int_obs <- t(simplify2array(lapply(2:26, IntegrateObs, wqb_tb, ti_tb)))
 obs_df <- data.frame(datetime=nutdates[2:26], temps=int_obs[,1], luxs=int_obs[,2])
-#par(mfrow=c(2,1))
+
+par(mar=c(1,1,1,1))
+par(mfrow=c(2,1))
 barplot(height=obs_df$temps, names.arg=obs_df$datetime)
 barplot(height=obs_df$lux, names.arg=obs_df$datetime)
 ```
@@ -217,24 +247,7 @@ Pcor_lux <- cor(Pdelta_df$delta, obs_df$lux)
 Ncor_tl <- cor(Ndelta_df$delta, obs_df$temps * obs_df$luxs)
 Pcor_tl <- cor(Pdelta_df$delta, obs_df$temps * obs_df$luxs)
 ```
-### Total Nitrogen  
-
-### PO4 Phosphate
-
-### pH   
-
-### Biomass
-Algal biomass grows by
-
-# Conclusions  
-The FZ-J WWTP Pilot successfully demonstrated highly effective ATS treatment of secondary sewage, reducing
-
-# Acknowledgements  
-The authors would like to thank Christina Kuchendorf, Marian Roeb, and Philipp Norf for invaluable
-assistance during this project.
-
 # Tables
 ```{r Table1}
 #kable(file)
 ```
-# Figures
