@@ -21,6 +21,7 @@ library(lubridate)
 library(knitr)
 source("Code/R/Settings.R")
 source("Code/R/FZJWWTPP.R")
+old_par <- par(no.readonly = TRUE)
 ```
 ```{r loaddata}
 ti_tb <- read_csv(ti_fn)
@@ -59,9 +60,7 @@ a single data frame and exported to the file `FZJATSPilot.csv`.
 ## Water Chemistry and Biomass  
 Total nitrogen and $\mathrm{PO}_4$ phosphate determinations were performed on daily samples taken
 before and after water exchange. Samples not assayed on the day they were taken were frozen and
-assayed later. On two occasions, samples were assayed both on the day they were taken and
-after freezing (Table 2). As the differences between the readings for frozen and unfrozen samples
-was smalls
+assayed later. 
 
 ### Total Nitrogen  
 Deviation from the sawtooth pattern
@@ -99,12 +98,75 @@ we then multiply DM $\times$ LM and plot these values against nutrient removal f
 
 # Figures  
 
-
 ![Figure 1](../../Figures/Figure1.png)
 Figure 1.  Pilot ATS floway at Forshungszentrum-Jülich's wastewater treatment plant. (A) View
 looking upslope towards headworks, with HOBO datalogger (inset) in foreground. (B) Side view
 of installation, with reservoir tank on the left.
 
+```{r Figure2}
+# We need an ordered list of all the dates, not just the ones in the data frame
+dates <- seq(min(wqb_tb$obsdate), max(wqb_tb$obsdate), by = 1)
+
+# Plot parameters
+oldpar <- par(no.readonly=T)
+
+# Create the device for the abstract
+png(fig_fn[2], width=6.5, height=3, units="in", res=600)
+
+# Assign parameters for the plot
+par(mar=c(3,3,1,1)+0.1,
+    mgp=c(1.5, 0.5, 0),
+    mfrow=c(1,2))
+
+# Plot N
+plot(wqb_tb$obsdate,
+     wqb_tb$TN,
+     type="l",
+     xlab="Date",
+     ylab=expression(paste("Total N (mg L"^"-1", ")")),
+     cex.lab=0.8,
+     axes=FALSE)
+
+axis(side=1,
+     labels=dates[c(1, 8, 15, 22, 29, 36, 43, 48)],
+     at=dates[c(1, 8, 15, 22, 29, 36, 43, 48)],
+     las=1,
+     cex.axis = 0.6)
+
+axis(side=2,
+     labels=seq(0, 14, by=2),
+     at=seq(0, 14, by=2),
+     las=1,
+     cex.axis=0.6)
+
+points(wqb_tb[wqb_tb$before==TRUE,]$obsdate, wqb_tb[wqb_tb$before==TRUE,]$TN, pch=1, cex=0.5)
+points(wqb_tb[wqb_tb$before==FALSE,]$obsdate+0, wqb_tb[wqb_tb$before==FALSE,]$TN, pch=0, cex=0.5)
+
+# Plot P
+plot(wqb_tb$obsdate,
+     wqb_tb$PO4P,
+     type="l",
+     xlab="Date",
+     ylab=expression(paste("PO" ["4"], " Phosphorus (mg L"^"-1", ")")),
+     cex.lab=0.8,
+     axes=FALSE)
+axis(side=1,
+     labels=dates[c(1, 8, 15, 22, 29, 36, 43, 48)],
+     at=dates[c(1, 8, 15, 22, 29, 36, 43, 48)],
+     las=1,
+     cex.axis = 0.6)
+axis(side=2,
+     labels=seq(0, 14, by=2),
+     at=seq(0, 14, by=2),
+     las=1,
+     cex.axis=0.6)
+
+points(wqb_tb[wqb_tb$before==TRUE,]$obsdate, wqb_tb[wqb_tb$before==TRUE,]$PO4P, pch=1, cex=0.5)
+points(wqb_tb[wqb_tb$before==FALSE,]$obsdate+0, wqb_tb[wqb_tb$before==FALSE,]$PO4P, pch=0, cex=0.5)
+
+dev.off()
+par(oldpar)
+```
 ```{r DMLM}
 # A global list of unique dates of nutrient assays
 nutdates <- sort(unique(make_date(year(wqb_tb$datetime), month(wqb_tb$datetime), day(wqb_tb$datetime))))
@@ -115,48 +177,11 @@ par(mar=c(1,1,1,1))
 par(mfrow=c(2,1))
 barplot(height=obs_df$temps, names.arg=obs_df$datetime)
 barplot(height=obs_df$lux, names.arg=obs_df$datetime)
+par(old_par)
 ```
 
 To integrate temperature and illumination data we sum the values (after converting temperature from degrees
 Celsius to degrees Kelvin) approximate for each interval between N and P assays. 
-
-## Validity of nutrient assays of frozen samples
-```{r Frozen}
-# Which assays had results for both frozen and non-frozen samples?
-#
-# First get indices of before/after for frozen/nonfrozen samples
-nf_before <- which(wqb_tb$frozen == FALSE & wqb_tb$before == TRUE)
-nf_after <- which(wqb_tb$frozen == FALSE & wqb_tb$before == FALSE)
-f_before <- which(wqb_tb$frozen == TRUE & wqb_tb$before == TRUE)
-f_after <- which(wqb_tb$frozen == TRUE & wqb_tb$before == FALSE)
-
-# Then, for each assay that was frozen, was there a frozen assay for that date,
-# And for each assay that wasn't frozen, was there an unfrozen assay for that date
-both_before_nf <- wqb_tb[nf_before,]$obsdate %in% wqb_tb[f_before,]$obsdate
-both_after_nf <- wqb_tb[nf_after,]$obsdate %in% wqb_tb[f_after,]$obsdate
-both_before_f <- wqb_tb[f_before,]$obsdate %in% wqb_tb[nf_before,]$obsdate
-both_after_f <- wqb_tb[f_after,]$obsdate %in% wqb_tb[nf_after,]$obsdate
-
-# What are the dates for all those
-nf_before_dates <- wqb_tb[nf_before[both_before_nf],]$obsdate
-# nf_after_dates <- wqb_tb[nf_after[both_after_nf],]$obsdate
-# f_before_dates <- wqb_tb[f_before[both_before_f],]$obsdate
-# f_after_dates <- wqb_tb[f_after[both_after_f],]$obsdate
-
-# What are the differences between the measurements
-N_nf_before <- wqb_tb[nf_before[both_before_nf],]$TN
-N_f_before <- wqb_tb[f_before[both_before_f],]$TN
-P_nf_before <- wqb_tb[nf_before[both_before_nf],]$PO4P
-P_f_before <- wqb_tb[f_before[both_before_f],]$PO4P
-
-N_rat <- (N_nf_before - N_f_before) / N_nf_before
-P_rat <- (P_nf_before - P_f_before) / P_nf_before
-```
-Samples taken on `r nf_before_dates[1]` and `r nf_before_dates[2]` were assayed both
-immediately after sampling and after having been frozen. The readings of frozen N
-samples differed by `r 100*N_rat[1]`% and `r 100*N_rat[2]`%, and the readings of frozen P
-samples differed by `r 100*P_rat[1]`% and `r 100*P_rat[2]`%, respectively. These differences are very small so the
-samples were frozen and accumulated and assayed in batches.
 
 ```{r NutrientAssays}
 # Create a table for displaying dates of assays

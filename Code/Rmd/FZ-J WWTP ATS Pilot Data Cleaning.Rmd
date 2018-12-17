@@ -102,7 +102,6 @@ ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[7], 84, 54, w=7))
 write_csv(ti_df, ti_fn)
 ```
 
-# Floway Chemistry & Biomass
 ```{r WaterQualityBiomass}
 # Load the data in the Excel spreadsheet into a temporary data frame
 t_df <- read_excel(ss_fn,
@@ -173,6 +172,30 @@ wqb_df$solids <- t_df$bmdrypct
 # Need observation date separate from datetime to make life easier
 wqb_df$obsdate <- make_date(year(wqb_df$datetime), month(wqb_df$datetime), day(wqb_df$datetime))
 ```
+# Floway Chemistry & Biomass
+On two occasions, samples were assayed both on the day they were taken and after
+freezing (Table 1). As the absolute differences between the readings for frozen
+and unfrozen samples was small, less than 5% except for two measurements, it was
+decided to freeze and accumulate samples for collective analysis rather than assay
+each sample on the day it was collected.
+
+```{r RemoveDupes}
+# Remove non-frozen duplicates
+dupe_df <- wqb_df[c(3:6, 13:16),] %>% select(datetime, before, PO4P, TN, frozen)
+dupedeltas_df <- data.frame(before = c(FALSE, TRUE, FALSE, TRUE),
+                            PO4Pdelta = c(dupe_df[2,]$PO4P - dupe_df[1,]$PO4P,
+                                          dupe_df[4,]$PO4P - dupe_df[3,]$PO4P,
+                                          dupe_df[6,]$PO4P - dupe_df[5,]$PO4P,
+                                          dupe_df[8,]$PO4P - dupe_df[7,]$PO4P),
+                            TNdelta = c(dupe_df[2,]$TN - dupe_df[1,]$TN,
+                                          dupe_df[4,]$TN - dupe_df[3,]$TN,
+                                          dupe_df[6,]$TN - dupe_df[5,]$TN,
+                                          dupe_df[8,]$TN - dupe_df[7,]$TN))
+dupedeltas_df$PO4Ppct <- 100*dupedeltas_df$PO4Pdelta/dupe_df[c(2, 4, 6, 8),]$PO4P
+dupedeltas_df$TNpct <- 100*dupedeltas_df$TNdelta/dupe_df[c(2, 4, 6, 8),]$TN
+kable(dupedeltas_df)
+```
 ```{r save_cb}
+wqb_df <- wqb_df[c(1:2, 4, 6:12, 14, 16:55),]
 write_csv(wqb_df, wqb_fn)
 ```
