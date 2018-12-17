@@ -5,7 +5,7 @@
 .DS_Store
 *.Rproj
 *.pdf
-*.xlsx
+*.png
 *.hobo
 Visual Elements/*
 Documents/*
