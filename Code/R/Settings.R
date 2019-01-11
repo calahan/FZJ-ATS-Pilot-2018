@@ -24,9 +24,15 @@ fig_fn <- c("Figures/Figure1.png", "Visual Elements/Figures/Figure2.png")
 # Spreadsheet of water chemistry and biomass observations
 ss_fn <- paste0(ss_dir, "ATS Treatment.xlsx")
 
+# Spreadsheet of biomass composition data
+bcss_fn <- paste0(ss_dir, "Analysen ZEA-3.xlsx")
+
 # Output filenames
 # Cleaned temperature and illumination observations
 ti_fn <- paste0(csv_dir, "FZJ WWTP ATS Pilot Temperature and Illumination.csv")
 
 # Cleaned water chemistry and biomass observations
 wqb_fn <- paste0(csv_dir, "FZJ WWTP ATS Pilot Chemistry and Biomass.csv")
+
+# Cleaned biomass composition
+bc_fn <- paste0(csv_dir, "FZJ WWTP ATS Pilot Biomass Composition.csv")

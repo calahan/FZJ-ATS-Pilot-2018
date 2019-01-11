@@ -153,3 +153,6 @@ IntegrateObs <- function(d, df1, df2, diag=FALSE) {
 
     return(c(sum(temps), sum(luxs)))
 }
+
+BiomassData <- function() {
+}

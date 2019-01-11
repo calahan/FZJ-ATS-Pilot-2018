@@ -49,11 +49,14 @@ of the early and late regions. The numbers in the function call that performs th
 data cleaning refer to how many observations are removed from the beginning and
 end of the data set, respectively.
 
-# Water Quality and Biomass Characteristics
+# Water Quality and Biomass Productivity
 Some of the columns ("Dilution PO4-P", "PO4-P", "reduction", "Dilution TNb", "TNb",
 "remark"), were not retained in the cleaned data, while others (unnamed column with
 "before/after", "commend") were converted from text to logical for improved ease of
 analysis.
+
+# Biomass Composition
+Here we access a separate spreadsheet.
 
 \newpage
 ## Week 1 (ATS_1)  
@@ -102,6 +105,12 @@ ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[7], 84, 54, w=7))
 write_csv(ti_df, ti_fn)
 ```
 
+# Floway Chemistry & Biomass Productivity
+On two occasions, samples were assayed both on the day they were taken and after
+freezing (Table 1). As the absolute differences between the readings for frozen
+and unfrozen samples was small, less than 5% except for two measurements, it was
+decided to freeze and accumulate samples for collective analysis rather than assay
+each sample on the day it was collected.
 ```{r WaterQualityBiomass}
 # Load the data in the Excel spreadsheet into a temporary data frame
 t_df <- read_excel(ss_fn,
@@ -172,13 +181,6 @@ wqb_df$solids <- t_df$bmdrypct
 # Need observation date separate from datetime to make life easier
 wqb_df$obsdate <- make_date(year(wqb_df$datetime), month(wqb_df$datetime), day(wqb_df$datetime))
 ```
-# Floway Chemistry & Biomass
-On two occasions, samples were assayed both on the day they were taken and after
-freezing (Table 1). As the absolute differences between the readings for frozen
-and unfrozen samples was small, less than 5% except for two measurements, it was
-decided to freeze and accumulate samples for collective analysis rather than assay
-each sample on the day it was collected.
-
 ```{r RemoveDupes}
 # Remove non-frozen duplicates
 dupe_df <- wqb_df[c(3:6, 13:16),] %>% select(datetime, before, PO4P, TN, frozen)
@@ -198,4 +200,28 @@ kable(dupedeltas_df)
 ```{r save_cb}
 wqb_df <- wqb_df[c(1:2, 4, 6:12, 14, 16:55),]
 write_csv(wqb_df, wqb_fn)
+```
+# Biomass Composition
+```{r BiomassComposition}
+bc_df <- read_excel(bcss_fn,
+                   sheet="Tabelle1",
+                   skip=18,
+                   col_names=c("id",
+                               "date",
+                               "Smw",
+                               "Ssd",
+                               "Pmw",
+                               "Psd",
+                               "Kmw",
+                               "Ksd",
+                               "Camw",
+                               "Casd",
+                               "Mgmw",
+                               "Mgsd",
+                               "Mnmw",
+                               "Mnsd",
+                               "Cmmw",
+                               "Csd",
+                               "Nmw",
+                               "Nsd"))
 ```
