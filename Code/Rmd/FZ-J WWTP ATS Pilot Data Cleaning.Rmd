@@ -17,16 +17,23 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 library(readr)
 library(readxl)
 library(dplyr)
+library(tidyr)
 library(lubridate)
 library(knitr)
+library(PeriodicTable)
+library(ggplot2)
+
 source("Code/R/Settings.R")
 source("Code/R/FZJWWTPP.R")
 ```
 # Introduction  
-Here we clean the data by reading the data files, manipulating the data to better
-organize it for analysis, then saving the reoragnized data as csv files. Temperature
-and illumination data were downloaded weekly from a HOBO data logger. Water quality and
-biomass data were entered manually into a spreadsheet.
+Here we clean the data from the 2018 ATS pilot at Forschungszentrum-Jülich and generate
+csv files for general consumption. Temperature and illumination data were downloaded
+weekly from a HOBO data logger. Water quality data was obtained by using standardized
+kits. Biomass productivity data was obtained by weighing wet and dried biomass harvested
+from a defined portion of the floway surface. Water quality and biomass data were
+entered manually into the spreadsheet `ATS Treatment.xlsx`. Biomass composition
+data was obtained by standard analyses and stored in the spreadsheet `Analysen ZEA-3.xlsx`.
 
 To clean the temperature and illumination data, each week's data file (`ATS_<#.dd.mm.yy>.hobo`)
 was converted csv using the Onset's HOBOware software (note that the files `*.hproj`
@@ -40,7 +47,8 @@ the water quality and biomass data, recorded manually in an Excel spreadsheet, t
 spreadsheet data were loaded and manipulated into a schema more useful for analysis
 before being saved as a csv file.
 
-# Temperature and Illumination  
+# Data Descriptions
+## Temperature and Illumination
 Each week's data is shown in several views, for both illumination and temperature.
 First the entire data set is shown, with vertical blue lines indicating either the
 earliest observation that was retained (right hand side) or the latest observation
@@ -49,14 +57,12 @@ of the early and late regions. The numbers in the function call that performs th
 data cleaning refer to how many observations are removed from the beginning and
 end of the data set, respectively.
 
-# Water Quality and Biomass Productivity
-Some of the columns ("Dilution PO4-P", "PO4-P", "reduction", "Dilution TNb", "TNb",
-"remark"), were not retained in the cleaned data, while others (unnamed column with
-"before/after", "commend") were converted from text to logical for improved ease of
-analysis.
-
-# Biomass Composition
-Here we access a separate spreadsheet.
+## Water Quality, Biomass Productivity, Biomass Composition
+Some of the columns of `ATS Treatment.xlsx` ("Dilution PO4-P", "PO4-P", "reduction",
+"Dilution TNb", "TNb", "remark"), were not retained in the cleaned data, while others
+(unnamed column with "before/after", "commend") were converted from text to logical
+for improved ease of analysis. All of the columns of `Analysen ZEA-3.xlsx` were
+retained.
 
 \newpage
 ## Week 1 (ATS_1)  
@@ -203,6 +209,9 @@ write_csv(wqb_df, wqb_fn)
 ```
 # Biomass Composition
 ```{r BiomassComposition}
+atoms <- c("C", "Ca", "K","Mg", "Mn", "N", "P", "S")
+masses <- setNames(mass(atoms), atoms)
+
 bc_df <- read_excel(bcss_fn,
                    sheet="Tabelle1",
                    skip=18,
@@ -220,8 +229,23 @@ bc_df <- read_excel(bcss_fn,
                                "Mgsd",
                                "Mnmw",
                                "Mnsd",
-                               "Cmmw",
+                               "Cmw",
                                "Csd",
                                "Nmw",
                                "Nsd"))
+
+
+val_cols <- c("Cmw", "Nmw", "Mgmw", "Pmw", "Smw", "Kmw", "Camw", "Mnmw")
+sel_cols <- c("date", "reading", "val")
+sd <- as.numeric(with(bc_df, c(Csd, Nsd, Mgsd, Psd, Ssd, Ksd, Casd, Mnsd)))
+bc_plot_df <- bc_df %>%
+    gather_(key="reading", value="val", gather_cols=val_cols) %>%
+    select(sel_cols)
+bc_plot_df$sd <- sd
+
+ggplot(bc_plot_df, aes(x=date, y=val, fill=reading)) +
+    geom_bar(stat="identity", position=position_dodge()) +
+    geom_errorbar(aes(ymin=val-sd, ymax=val+sd), 
+                  position=position_dodge())
+
 ```
