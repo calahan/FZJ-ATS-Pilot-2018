@@ -63,25 +63,29 @@ HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), window=c(NA, NA),
 
     row_ct <- nrow(tb)
 
-    # Adjust trim[2] to reflect actual index, not number of observations to remove
+    # Adjust trim[2] to reflect the index, not the number of observations to remove
     if(is.na(trim[1])) {
         trim <- c(0, row_ct)
     } else {
     trim <- c(trim[1], row_ct - trim[2])
     }
 
+    # If window was not supplied, set it to include the entire data set
     if(is.na(window[1])) {
         window <- c(1, row_ct)
     }
 
+    # Output the text if desired
     if(text) {
         cat(paste0(fn, ": ", nrow(tb), " ", "observations\n"))
     }
 
+    # Plot the data if desired
     if(view) {
         par(mfrow=c(1,2))
         par(ps = 12, cex = 1, cex.main = 1)
 
+        # Plot illumination data
         plot(x=tb[window[1]:window[2],]$datetime,
              y=tb[window[1]:window[2],]$lux,
              type="l",
@@ -89,12 +93,14 @@ HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), window=c(NA, NA),
              xlab="Date",
              ylab="Lux")
 
+        # Add vertical lines to show the window
         abline(v=c(tb[trim[1],]$datetime,
                    tb[trim[2],]$datetime),
                col=c("blue", "blue"),
                lty=c(1, 1),
                lwd=c(1, 1))
 
+        # Plot temperature data
         plot(x=tb[window[1]:window[2],]$datetime,
              y=tb[window[1]:window[2],]$temp,
              type="l",
@@ -102,6 +108,7 @@ HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), window=c(NA, NA),
              xlab="Date",
              ylab="Temperature")
 
+        # Add vertical lines to show the window
         abline(v=c(tb[trim[1],]$datetime,
                    tb[trim[2],]$datetime),
                col=c("blue", "blue"),
@@ -110,10 +117,12 @@ HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), window=c(NA, NA),
 
     }
 
+    # If week number was supplied, create a column with it
     if(!is.na(week)) {
         tb$week <- week
     }
 
+    # Return the data within the window.
     if(ret) {
         return(tb[trim[1]:trim[2],])
     }
@@ -190,7 +199,7 @@ WaterQualityBiomass <- function() {
 # s: Creation of the csv file "FZJ WWTP ATS Pilot Chemistry and Biomass.csv"
 
     # Read the spreadsheet
-    t_df <- read_excel(ss_fn,
+    t_df <- read_excel(sswc_fn,
                        sheet="Tabelle1",
                        skip=3,
                        col_names=c("date",
@@ -257,6 +266,8 @@ WaterQualityBiomass <- function() {
 
     # Need observation date separate from datetime to make life easier
     wqb_df$obsdate <- make_date(year(wqb_df$datetime), month(wqb_df$datetime), day(wqb_df$datetime))
+
+    return(wqb_df)
 }
 
 BiomassData <- function() {

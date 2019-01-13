@@ -14,15 +14,6 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, fig.height=3)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 ```{r initialize}
-# library(readr)
-# library(readxl)
-# library(dplyr)
-# library(tidyr)
-# library(lubridate)
-# library(knitr)
-# library(PeriodicTable)
-# library(ggplot2)
-
 source("Code/R/Settings.R")
 source("Code/R/FZJWWTPP.R")
 ```
@@ -120,28 +111,28 @@ each sample on the day it was collected.
 
 ```{r WaterQualityBiomass}
 # Load the data in the Excel spreadsheet into a temporary data frame
-t_df <- read_excel(sswc_fn,
-                   sheet="Tabelle1",
-                   skip=3,
-                   col_names=c("date",
-                               "time",
-                               "beforeafter",
-                               "PO4dil",
-                               "PO4P",
-                               "PO4Pxdil",
-                               "PO4Pred",
-                               "dilTN",
-                               "TNxdil",
-                               "TN",
-                               "TNred",
-                               "comment",
-                               "remark",
-                               "assaydate",
-                               "bmwet",
-                               "bmdry",
-                               "bmdrypct",
-                               "pH"))
-
+# t_df <- read_excel(sswc_fn,
+#                    sheet="Tabelle1",
+#                    skip=3,
+#                    col_names=c("date",
+#                                "time",
+#                                "beforeafter",
+#                                "PO4dil",
+#                                "PO4P",
+#                                "PO4Pxdil",
+#                                "PO4Pred",
+#                                "dilTN",
+#                                "TNxdil",
+#                                "TN",
+#                                "TNred",
+#                                "comment",
+#                                "remark",
+#                                "assaydate",
+#                                "bmwet",
+#                                "bmdry",
+#                                "bmdrypct",
+#                                "pH"))
+t_df <- WaterQualityBiomass()
 # Impute missing times. We take the earliest time, and simply add 24 hours to it
 # [todo] Is this even used? There is something wrong here at any rate
 no_times <- which(is.na(t_df$time))
