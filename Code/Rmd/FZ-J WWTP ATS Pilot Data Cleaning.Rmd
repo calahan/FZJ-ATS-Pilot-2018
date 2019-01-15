@@ -109,168 +109,55 @@ and unfrozen samples was small, less than 5% except for two measurements, it was
 decided to freeze and accumulate samples for collective analysis rather than assay
 each sample on the day it was collected.  
 
-```{r WaterQualityBiomass}
-# Load the data in the Excel spreadsheet into a temporary data frame
-# t_df <- read_excel(sswc_fn,
-#                    sheet="Tabelle1",
-#                    skip=3,
-#                    col_names=c("date",
-#                                "time",
-#                                "beforeafter",
-#                                "PO4dil",
-#                                "PO4P",
-#                                "PO4Pxdil",
-#                                "PO4Pred",
-#                                "dilTN",
-#                                "TNxdil",
-#                                "TN",
-#                                "TNred",
-#                                "comment",
-#                                "remark",
-#                                "assaydate",
-#                                "bmwet",
-#                                "bmdry",
-#                                "bmdrypct",
-#                                "pH"))
-t_df <- WaterQualityBiomass()
-# Impute missing times. We take the earliest time, and simply add 24 hours to it
-# [todo] Is this even used? There is something wrong here at any rate
-no_times <- which(is.na(t_df$time))
-min_time <- min(ti_df[ti_df$week == 1,]$datetime)
-t_df[which(is.na(t_df$time)),]$time <- make_datetime(2018,
-                                                     12,
-                                                     31,
-                                                     8,
-                                                     0,
-                                                     0)
+```{r WaterChemistryBiomass}
+# Load and clean the data in "ATS Treatment.xlsx"
+wcb_df <- WaterChemistryBiomass()
+kable(WaterChemistryBiomassDupes())
 
-# Create a new data frame with date and time combined into datetime for each observation
-wcb_df <- data.frame(datetime=make_datetime(year(t_df$date),
-                                            month(t_df$date),
-                                            day(t_df$date),
-                                            hour(t_df$time),
-                                            minute(t_df$time),
-                                            second(t_df$time),
-                                            tz="Europe/Berlin"))
-
-# Make before/after a logical
-wcb_df$before <- TRUE
-wcb_df[which(t_df$beforeafter != "before"),]$before <- FALSE
-
-# Nutrient concentrations & pH
-wcb_df$PO4P <- t_df$PO4Pxdil
-wcb_df$TN <- t_df$TN
-wcb_df$pH <- t_df$pH
-
-# Make frozen/not frozen a logical
-wcb_df$frozen <- TRUE
-wcb_df[which(t_df$comment != "frozen"),]$frozen <- FALSE
-
-# Date of assay
-wcb_df$assaydate <- make_date(year(t_df$assaydate),
-                              month(t_df$assaydate),
-                              day(t_df$assaydate))
-
-# Biomass measurements
-wcb_df$wet_biomass <- t_df$bmwet
-wcb_df$dry_biomass <- t_df$bmdry
-wcb_df$solids <- t_df$bmdrypct
-
-# Need observation date separate from datetime to make life easier
-wcb_df$obsdate <- make_date(year(wcb_df$datetime), month(wcb_df$datetime), day(wcb_df$datetime))
-```
-```{r RemoveDupes}
-# Remove non-frozen duplicates
-dupe_df <- wcb_df[c(3:6, 13:16),] %>% select(datetime, before, PO4P, TN, frozen)
-dupedeltas_df <- data.frame(before = c(FALSE, TRUE, FALSE, TRUE),
-                            PO4Pdelta = c(dupe_df[2,]$PO4P - dupe_df[1,]$PO4P,
-                                          dupe_df[4,]$PO4P - dupe_df[3,]$PO4P,
-                                          dupe_df[6,]$PO4P - dupe_df[5,]$PO4P,
-                                          dupe_df[8,]$PO4P - dupe_df[7,]$PO4P),
-                            TNdelta = c(dupe_df[2,]$TN - dupe_df[1,]$TN,
-                                          dupe_df[4,]$TN - dupe_df[3,]$TN,
-                                          dupe_df[6,]$TN - dupe_df[5,]$TN,
-                                          dupe_df[8,]$TN - dupe_df[7,]$TN))
-dupedeltas_df$PO4Ppct <- 100*dupedeltas_df$PO4Pdelta/dupe_df[c(2, 4, 6, 8),]$PO4P
-dupedeltas_df$TNpct <- 100*dupedeltas_df$TNdelta/dupe_df[c(2, 4, 6, 8),]$TN
-kable(dupedeltas_df)
-```
-```{r save_cb}
+# Save the cleaned data with duplicates removed.
 wcb_df <- wcb_df[c(1:2, 4, 6:12, 14, 16:55),]
 write_csv(wcb_df, wcb_fn)
 ```
-# Biomass Composition
+
+# Biomass Composition Data
 ```{r BiomassCompositionData}
-atoms <- c("C", "Ca", "K","Mg", "Mn", "N", "P", "S")
-masses <- setNames(mass(atoms), atoms)
-
-bc_df <- read_excel(ssbc_fn,
-                   sheet="Tabelle1",
-                   skip=18,
-                   col_names=c("id",
-                               "date",
-                               "Smw",
-                               "Ssd",
-                               "Pmw",
-                               "Psd",
-                               "Kmw",
-                               "Ksd",
-                               "Camw",
-                               "Casd",
-                               "Mgmw",
-                               "Mgsd",
-                               "Mnmw",
-                               "Mnsd",
-                               "Cmw",
-                               "Csd",
-                               "Nmw",
-                               "Nsd"))
-
-
-val_cols <- c("Cmw", "Nmw", "Mgmw", "Pmw", "Smw", "Kmw", "Camw", "Mnmw")
-sel_cols <- c("date", "reading", "val")
-
-# "NAs introduced by coercion" warning is OK.
-sd <- suppressWarnings(as.numeric(with(bc_df, c(Csd, Nsd, Mgsd, Psd, Ssd, Ksd, Casd, Mnsd))))
-
-bc_plot_df <- bc_df %>%
-    gather_(key="reading", value="val", gather_cols=val_cols) %>%
-    select(sel_cols)
-bc_plot_df$sd <- sd
+bc_df <- BiomassCompositionData()
+PlotBiomassCompositionData(bc_df)
+PlotMeanBiomassCompositionData(bc_df)
 ```
 
 ```{r BiomassCompositionPlots}
-# Plot weight percents of biomass composition readings with their standard deviations.
-ggplot(bc_plot_df, aes(x=date, y=val, fill=reading)) +
-    geom_bar(stat="identity", position=position_dodge()) +
-    geom_errorbar(aes(ymin=val-sd, ymax=val+sd), 
-                  position=position_dodge(),
-                  na.rm=TRUE)
-
-# Plot means of the biomasscomposition readings
-bc_mean_df <- bc_df %>% summarize(Cmean = mean(Cmw, na.rm=TRUE), Csd = sd(Cmw, na.rm=TRUE),
-                    Nmean = mean(Nmw), Nsd = sd(Nmw),
-                    Mgmean = mean(Mgmw), Mgsd = sd(Mgmw),
-                    Pmean = mean(Pmw), Psd = sd(Pmw),
-                    Smean = mean(Smw), Ssd = sd(Smw),
-                    Kmean = mean(Kmw), Ksd = sd(Kmw),
-                    Camean = mean(Camw), Casd = sd(Camw),
-                    Mnmean = mean(Mnmw), Mnsd = sd(Mnmw))
-
-val_cols <- c("Cmean", "Nmean", "Mgmean", "Pmean", "Smean", "Kmean", "Camean", "Mnmean")
-sd <- with(bc_mean_df, c(Csd, Nsd, Mgsd, Psd, Ssd, Ksd, Csd, Mnsd))
-sel_cols <- c("reading", "val")
-
-bc_mean_plot_df <- bc_mean_df %>%
-    gather_(key="reading", value="val", val_cols) %>%
-    select(sel_cols)
-
-ggplot(bc_mean_plot_df, aes(x=reading, y=val)) +
-    geom_bar(stat="identity", position=position_dodge()) +
-    geom_errorbar(aes(ymin=val-sd, ymax=val+sd), 
-                  position=position_dodge())
-
-# Molar ratios
+# # Plot weight percents of biomass composition readings with their standard deviations.
+# ggplot(bc_plot_df, aes(x=date, y=val, fill=reading)) +
+#     geom_bar(stat="identity", position=position_dodge()) +
+#     geom_errorbar(aes(ymin=val-sd, ymax=val+sd), 
+#                   position=position_dodge(),
+#                   na.rm=TRUE)
+# 
+# # Plot means of the biomasscomposition readings
+# bc_mean_df <- bc_df %>% summarize(Cmean = mean(Cmw, na.rm=TRUE), Csd = sd(Cmw, na.rm=TRUE),
+#                     Nmean = mean(Nmw), Nsd = sd(Nmw),
+#                     Mgmean = mean(Mgmw), Mgsd = sd(Mgmw),
+#                     Pmean = mean(Pmw), Psd = sd(Pmw),
+#                     Smean = mean(Smw), Ssd = sd(Smw),
+#                     Kmean = mean(Kmw), Ksd = sd(Kmw),
+#                     Camean = mean(Camw), Casd = sd(Camw),
+#                     Mnmean = mean(Mnmw), Mnsd = sd(Mnmw))
+# 
+# val_cols <- c("Cmean", "Nmean", "Mgmean", "Pmean", "Smean", "Kmean", "Camean", "Mnmean")
+# sd <- with(bc_mean_df, c(Csd, Nsd, Mgsd, Psd, Ssd, Ksd, Csd, Mnsd))
+# sel_cols <- c("reading", "val")
+# 
+# bc_mean_plot_df <- bc_mean_df %>%
+#     gather_(key="reading", value="val", val_cols) %>%
+#     select(sel_cols)
+# 
+# ggplot(bc_mean_plot_df, aes(x=reading, y=val)) +
+#     geom_bar(stat="identity", position=position_dodge()) +
+#     geom_errorbar(aes(ymin=val-sd, ymax=val+sd), 
+#                   position=position_dodge())
+# 
+# # Molar ratios
 moles <- with(bc_mean_df, c(Cmean, Nmean, Mgmean, Pmean, Smean, Kmean, Camean, Mnmean))/
     sort(masses)
 

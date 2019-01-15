@@ -193,7 +193,7 @@ IntegrateObs <- function(d, df1, df2, diag=FALSE) {
 }
 
 # Create a cleaned data frame from the spreadsheet "ATS Treatment"
-WaterQualityBiomass <- function() {
+WaterChemistryBiomass <- function() {
 # i: NA
 # v: A cleaned data frame containing results from water chemistry analsysis
 # s: Creation of the csv file "FZJ WWTP ATS Pilot Chemistry and Biomass.csv"
@@ -270,5 +270,110 @@ WaterQualityBiomass <- function() {
     return(wqb_df)
 }
 
-BiomassData <- function() {
+# Create a data frame with nutrient removal metrics for samples that were assayed
+# both frozen and fresh.
+WaterChemistryBiomassDupes <- function() {
+    dupe_df <- wcb_df[c(3:6, 13:16),] %>% select(datetime, before, PO4P, TN, frozen)
+    dupedeltas_df <- data.frame(before = c(FALSE, TRUE, FALSE, TRUE),
+                                PO4Pdelta = c(dupe_df[2,]$PO4P - dupe_df[1,]$PO4P,
+                                              dupe_df[4,]$PO4P - dupe_df[3,]$PO4P,
+                                              dupe_df[6,]$PO4P - dupe_df[5,]$PO4P,
+                                              dupe_df[8,]$PO4P - dupe_df[7,]$PO4P),
+                                TNdelta = c(dupe_df[2,]$TN - dupe_df[1,]$TN,
+                                            dupe_df[4,]$TN - dupe_df[3,]$TN,
+                                            dupe_df[6,]$TN - dupe_df[5,]$TN,
+                                            dupe_df[8,]$TN - dupe_df[7,]$TN))
+    dupedeltas_df$PO4Ppct <- 100*dupedeltas_df$PO4Pdelta/dupe_df[c(2, 4, 6, 8),]$PO4P
+    dupedeltas_df$TNpct <- 100*dupedeltas_df$TNdelta/dupe_df[c(2, 4, 6, 8),]$TN
+
+    return(dupedeltas_df)
+}
+
+BiomassCompositionData <- function() {
+    return(read_excel(ssbc_fn,
+                      sheet="Tabelle1",
+                      skip=18,
+                      col_names=c("id",
+                                  "date",
+                                  "Smw",
+                                  "Ssd",
+                                  "Pmw",
+                                  "Psd",
+                                  "Kmw",
+                                  "Ksd",
+                                  "Camw",
+                                  "Casd",
+                                  "Mgmw",
+                                  "Mgsd",
+                                  "Mnmw",
+                                  "Mnsd",
+                                  "Cmw",
+                                  "Csd",
+                                  "Nmw",
+                                  "Nsd")))
+}
+
+PlotBiomassCompositionData <- function(df) {
+    atoms <- c("C", "Ca", "K","Mg", "Mn", "N", "P", "S")
+    masses <- setNames(mass(atoms), atoms)
+
+    val_cols <- c("Cmw", "Nmw", "Mgmw", "Pmw", "Smw", "Kmw", "Camw", "Mnmw")
+    sel_cols <- c("date", "reading", "val")
+
+    # "NAs introduced by coercion" warning is OK.
+    sd <- suppressWarnings(as.numeric(with(df, c(Csd, Nsd, Mgsd, Psd, Ssd, Ksd, Casd, Mnsd))))
+
+    plot_df <- df %>%
+        gather_(key="reading", value="val", gather_cols=val_cols) %>%
+        select(sel_cols)
+    plot_df$sd <- sd
+
+    # Plot weight percents of biomass composition readings with their standard deviations.
+    return(ggplot(plot_df, aes(x=date, y=val, fill=reading)) +
+        geom_bar(stat="identity", position=position_dodge()) +
+        geom_errorbar(aes(ymin=val-sd, ymax=val+sd),
+                      position=position_dodge(),
+                      na.rm=TRUE))
+}
+
+MeanBiomassComposition <- function(df) {
+    return(df %>% summarize(Cmean = mean(Cmw, na.rm=TRUE), Csd = sd(Cmw, na.rm=TRUE),
+                            Nmean = mean(Nmw), Nsd = sd(Nmw),
+                            Mgmean = mean(Mgmw), Mgsd = sd(Mgmw),
+                            Pmean = mean(Pmw), Psd = sd(Pmw),
+                            Smean = mean(Smw), Ssd = sd(Smw),
+                            Kmean = mean(Kmw), Ksd = sd(Kmw),
+                            Camean = mean(Camw), Casd = sd(Camw),
+                            Mnmean = mean(Mnmw), Mnsd = sd(Mnmw)))
+}
+
+PlotMeanBiomassCompositionData <- function(df) {
+    mean_df <- MeanBiomassComposition(df)
+
+    val_cols <- c("Cmean", "Nmean", "Mgmean", "Pmean", "Smean", "Kmean", "Camean", "Mnmean")
+    sd <- with(mean_df, c(Csd, Nsd, Mgsd, Psd, Ssd, Ksd, Csd, Mnsd))
+    sel_cols <- c("reading", "val")
+
+    mean_df <- mean_df %>%
+        gather_(key="reading", value="val", val_cols) %>%
+        select(sel_cols)
+
+    # ggplot orders x axis alphabetically for labels, but with factors we can order at will
+    # get order of readings
+    ro <- order(mean_df$val, decreasing = TRUE)
+    reading <- val_cols[ro]
+    mean_df$reading <- factor(val_cols, levels=reading)
+
+    return(ggplot(mean_df, aes(x=reading, y=val)) +
+        geom_bar(stat="identity", position=position_dodge()) +
+        geom_errorbar(aes(ymin=val-sd, ymax=val+sd),
+                      position=position_dodge()))
+}
+
+MolarRatios <- function(df) {
+    # Molar ratios
+    mean_df <- MeanBiomassComposition(df)
+
+    return(with(mean_df, c(Cmean, Nmean, Mgmean, Pmean, Smean, Kmean, Camean, Mnmean))/
+        sort(masses))
 }
