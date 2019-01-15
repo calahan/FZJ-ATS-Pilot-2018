@@ -124,43 +124,7 @@ write_csv(wcb_df, wcb_fn)
 bc_df <- BiomassCompositionData()
 PlotBiomassCompositionData(bc_df)
 PlotMeanBiomassCompositionData(bc_df)
-```
-
-```{r BiomassCompositionPlots}
-# # Plot weight percents of biomass composition readings with their standard deviations.
-# ggplot(bc_plot_df, aes(x=date, y=val, fill=reading)) +
-#     geom_bar(stat="identity", position=position_dodge()) +
-#     geom_errorbar(aes(ymin=val-sd, ymax=val+sd), 
-#                   position=position_dodge(),
-#                   na.rm=TRUE)
-# 
-# # Plot means of the biomasscomposition readings
-# bc_mean_df <- bc_df %>% summarize(Cmean = mean(Cmw, na.rm=TRUE), Csd = sd(Cmw, na.rm=TRUE),
-#                     Nmean = mean(Nmw), Nsd = sd(Nmw),
-#                     Mgmean = mean(Mgmw), Mgsd = sd(Mgmw),
-#                     Pmean = mean(Pmw), Psd = sd(Pmw),
-#                     Smean = mean(Smw), Ssd = sd(Smw),
-#                     Kmean = mean(Kmw), Ksd = sd(Kmw),
-#                     Camean = mean(Camw), Casd = sd(Camw),
-#                     Mnmean = mean(Mnmw), Mnsd = sd(Mnmw))
-# 
-# val_cols <- c("Cmean", "Nmean", "Mgmean", "Pmean", "Smean", "Kmean", "Camean", "Mnmean")
-# sd <- with(bc_mean_df, c(Csd, Nsd, Mgsd, Psd, Ssd, Ksd, Csd, Mnsd))
-# sel_cols <- c("reading", "val")
-# 
-# bc_mean_plot_df <- bc_mean_df %>%
-#     gather_(key="reading", value="val", val_cols) %>%
-#     select(sel_cols)
-# 
-# ggplot(bc_mean_plot_df, aes(x=reading, y=val)) +
-#     geom_bar(stat="identity", position=position_dodge()) +
-#     geom_errorbar(aes(ymin=val-sd, ymax=val+sd), 
-#                   position=position_dodge())
-# 
-# # Molar ratios
-moles <- with(bc_mean_df, c(Cmean, Nmean, Mgmean, Pmean, Smean, Kmean, Camean, Mnmean))/
-    sort(masses)
-
+PlotMolarRatios(bc_df)
 ```
 # Appendix  
 

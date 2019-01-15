@@ -351,6 +351,7 @@ PlotMeanBiomassCompositionData <- function(df) {
     mean_df <- MeanBiomassComposition(df)
 
     val_cols <- c("Cmean", "Nmean", "Mgmean", "Pmean", "Smean", "Kmean", "Camean", "Mnmean")
+    atom_labs <- c("C", "N", "Mg", "P", "S", "K", "Ca", "Mn")
     sd <- with(mean_df, c(Csd, Nsd, Mgsd, Psd, Ssd, Ksd, Csd, Mnsd))
     sel_cols <- c("reading", "val")
 
@@ -361,8 +362,8 @@ PlotMeanBiomassCompositionData <- function(df) {
     # ggplot orders x axis alphabetically for labels, but with factors we can order at will
     # get order of readings
     ro <- order(mean_df$val, decreasing = TRUE)
-    reading <- val_cols[ro]
-    mean_df$reading <- factor(val_cols, levels=reading)
+    reading <- atom_labs[ro]
+    mean_df$reading <- factor(atom_labs, levels=reading)
 
     return(ggplot(mean_df, aes(x=reading, y=val)) +
         geom_bar(stat="identity", position=position_dodge()) +
@@ -370,10 +371,27 @@ PlotMeanBiomassCompositionData <- function(df) {
                       position=position_dodge()))
 }
 
-MolarRatios <- function(df) {
+PlotMolarRatios <- function(df) {
     # Molar ratios
     mean_df <- MeanBiomassComposition(df)
+    atoms <- c("C", "N", "Mg", "P", "S", "K", "Ca", "Mn")
+    masses <- setNames(mass(atoms), atoms)
 
-    return(with(mean_df, c(Cmean, Nmean, Mgmean, Pmean, Smean, Kmean, Camean, Mnmean))/
-        sort(masses))
+    molar_v <- with(mean_df,
+                     c(Cmean, Nmean, Mgmean, Pmean, Smean, Kmean, Camean, Mnmean)/
+                         sort(masses))
+    molar_v <- molar_v/molar_v[["P"]]
+
+    molar_df <- data.frame(atom = names(molar_v), val = molar_v)
+
+    # ggplot orders x axis alphabetically for labels, but with factors we can order at will
+    # get order of readings
+    ro <- order(molar_df$val, decreasing = TRUE)
+    atoms <- atoms[ro]
+    molar_df$atom <- factor(atoms, levels=atoms)
+    molar_df$val <- molar_df[ro,]$val
+
+    return(ggplot(molar_df, aes(x=atom, y=val)) +
+        geom_bar(stat="identity", position=position_dodge()))
+
 }
