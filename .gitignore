@@ -5,6 +5,7 @@
 .DS_Store
 *.Rproj
 *.pdf
+*.hproj
 Visual Elements/*
 Documents/*
 Research/*
