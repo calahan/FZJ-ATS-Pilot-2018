@@ -56,6 +56,7 @@ for improved ease of analysis. All of the columns of `Analysen ZEA-3.xlsx` were
 retained.
 
 \newpage
+# Illustrative Figures  
 ## Week 1 (ATS_1)  
 ```{r week1}
 # Create initial cleaned data set
@@ -81,7 +82,7 @@ ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[4], 107, 227, w=4))
 ```
 
 ## Week 5 (ATS_1)  
-```{r week5, echo = TRUE}
+```{r week5}
 # Clean and append the next data set
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[5], 107, 227, w=5))
 ```
@@ -142,6 +143,55 @@ PlotBiomassCompositionData(bc_df)
 PlotMeanBiomassCompositionData(bc_df)
 PlotMolarRatios(bc_df)
 ```
-# Appendix  
 
-## Data Dictionaries
+# Data Dictionaries  
+                           `FZJ WWTP ATS Pilot Biomass Composition.csv`  
+
+Column           | Description  
+-----------------| -----------
+id               | Assay id  
+date             | Assay date  
+Smw              | Sulfur weight percent  
+Ssd              | Sulfur weight percent standard deviation  
+Pmw              | Phosphorus weight percent  
+Psd              | Phosphorus weight percent standard deviation  
+Kmw              | Potassium weight percent  
+Ksd              | Potassium weight percent standard deviation  
+Camw             | Calcium weight percent  
+Casd             | Calcium weight percent standard deviation  
+Mgmw             | Magnesium weight percent  
+Mgsd             | Magnesium weight percent standard deviation  
+Mnmw             | Manganese weight percent  
+Mnsd             | Manganese weight percent standard deviation  
+Cmw              | Carbon weight percent  
+Csd              | Carbon weight percent standard deviation  
+Nmw              | Nitrogen weight percent  
+Nsd              | Nitrogen weight percent standard deviation  
+
+                          `FZJ WWTP ATS Pilot Biomass Productivity.csv`  
+
+Column           | Description  
+---------------- | --------------  
+wet_biomass      | Biomass weight as harvested  
+dry_biomass      | Biomass weight after drying  
+obsdate          | Date of biomass harvest  
+
+                           `FZJ WWTP ATS Pilot Temperature and Irradiance.csv`  
+Column     | Description  
+---------- | --------------  
+datetime   | Date and time of observation  
+temp       | Temperature, °C  
+lux        | Irradiance, lux  
+week       | Week number  
+
+                           `FZJ WWTP ATS Pilot Water Chemistry.csv`  
+Column     | Description  
+---------- | --------------  
+datetime   | Date and time of observation  
+before     | Was the sample taken before or after water exchange?  
+PO4P       | Phosphate phosphorus, mg L-1  
+TN         | Total nitrogen, mg L-1  
+pH         | pH  
+frozen     | Was the assay performed on a frozen sample?  
+assaydate  | Date of assay  
+obsdate    | Date of observation  
