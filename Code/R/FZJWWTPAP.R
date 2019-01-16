@@ -23,9 +23,8 @@
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-#source("Settings.R")
-
 # Functions to support analysis of data from FZ-J WWTP ATS Pilot
+
 HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), window=c(NA, NA), view=TRUE, text=FALSE, ret=FALSE, week=NA) {
 # Load and optionally trim or plot data from a HOBO data logger.
 #
@@ -130,18 +129,18 @@ HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), window=c(NA, NA),
 
 CleanHOBOData <- function(fn, l, r, w) {
 #
-# i:
+# input:
 # fn    name of the csv file to clean
 # l     index of the first observaton to keep
 # r     index of the last observation to keep
 # w     2-element vector of the window to display
 #
-# se:
+# side effects:
 # Three pairs of plots are produced: one pair showing all data with vertical lines
 # at the cutoff observations, one pair zoomed in to the early cutoff zone, and one
 # pair zoomed in to the late cutoff zone
 #
-# v:
+# value:
 # A tibble of the cleaned data
 #
     tb <- HOBOData(fn, view=FALSE, ret=TRUE, week=w)

@@ -1,3 +1,28 @@
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# Copyright 2018-2019 by Forschungszentrum-Jülich (FZ-J)
+#
+# This file is part of the internal publication "FZ-J WWTP ATS Pilot" (FZJWWTPAP), a
+# literate program that documents data cleaning procedures for the creation of several
+# data sets arising from a project, running from August 18 through October 18 2018,
+# that demonstrated operation of an algal turf scrubber at FZ-J's Jülich campus
+# wastewater treatment plant.
+#
+# The software component of FZJWWTPAP is open access: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by the
+# Free Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+
+# The software component of FZJWWTPAP is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with the
+# software component of FZJWWTPP If not, see <http://www.gnu.org/licenses/>.
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 # Libraries
 library(readr)
 library(readxl)
@@ -42,13 +67,13 @@ pre <- "FZJ WWTP ATS Pilot "
 ext <- ".csv"
 
 # Cleaned temperature and illumination
-ti_fn <- paste0(csv_dir, pre, "Temperature and Illumination", ext)
+ti_fn <- paste0(csv_dir, pre, "Temperature and Irradiance", ext)
 
 # Cleaned water chemistry
-wc_fn <- paste0(csv_dir, pre, "Chemistry and Biomass", ext)
+wc_fn <- paste0(csv_dir, pre, "Water Chemistry", ext)
 
 # Cleaned biomass productivity
 bp_fn <- paste0(csv_dir, pre, "Biomass Productivity", ext)
 
 # Cleaned biomass composition
-bc_fn <- paste0(csv_dir, pre, "Pilot Biomass Composition", ext)
+bc_fn <- paste0(csv_dir, pre, "Biomass Composition", ext)
