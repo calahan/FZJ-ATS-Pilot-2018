@@ -19,14 +19,14 @@ source("Code/R/FZJWWTPP.R")
 ```
 # Introduction  
 Here we clean the data from the 2018 ATS pilot at Forschungszentrum-Jülich and generate
-csv files for general consumption. Temperature and illumination data were downloaded
+csv files for further analysis. Temperature and irradiance data were downloaded
 weekly from a HOBO data logger. Water quality data was obtained by using standardized
 kits. Biomass productivity data was obtained by weighing wet and dried biomass harvested
 from a defined portion of the floway surface. Water quality and biomass data were
 entered manually into the spreadsheet `ATS Treatment.xlsx`. Biomass composition
 data was obtained by standard analyses and stored in the spreadsheet `Analysen ZEA-3.xlsx`.
 
-To clean the temperature and illumination data, each week's data file (`ATS_<#.dd.mm.yy>.hobo`)
+To clean the temperature and irradiance data, each week's data file (`ATS_<#.dd.mm.yy>.hobo`)
 was converted csv using the Onset's HOBOware software (note that the files `*.hproj`
 contain metadata bout the `.hobo` files and were not processed). Because the data
 loggers were either initialized in an office before being transported to the floway
@@ -38,9 +38,9 @@ the water quality and biomass data, recorded manually in an Excel spreadsheet, t
 spreadsheet data were loaded and manipulated into a schema more useful for analysis
 before being saved as a csv file.
 
-# Data Descriptions
-## Temperature and Illumination
-Each week's data is shown in several views, for both illumination and temperature.
+# Data Set Descriptions
+## Temperature and irradiance
+Each week's data is shown in several views, for both irradiance and temperature.
 First the entire data set is shown, with vertical blue lines indicating either the
 earliest observation that was retained (right hand side) or the latest observation
 that was retained (left hand side). This global view is followed by a magnification
@@ -57,25 +57,25 @@ retained.
 
 \newpage
 ## Week 1 (ATS_1)  
-```{r week1, echo = TRUE}
+```{r week1}
 # Create initial cleaned data set
 ti_df <- CleanHOBOData(HOBO_fn[1], 1010, 365, w=1)
 ```
 
 ## Week 2 (ATS_2)  
-```{r week2, echo = TRUE}
+```{r week2}
 # Clean and append the next data set
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[2], 9773, 271, w=2))
 ```
 
 ## Week 3 (ATS_1)  
-```{r week3, echo = TRUE}
+```{r week3}
 # Clean and append the next data set
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[3], 119, 96, w=3))
 ```
 
 ## Week 4 (ATS_2)  
-```{r week4, echo = TRUE}
+```{r week4}
 # Clean and append the next data set
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[4], 107, 227, w=4))
 ```
@@ -87,13 +87,13 @@ ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[5], 107, 227, w=5))
 ```
 
 ## Week 6 (ATS_2)  
-```{r week6, echo = TRUE}
+```{r week6}
 # Clean and append the next data set
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[6], 121, 65, w=6))
 ```
 
 ## Week 7 (ATS_1)  
-```{r week7, echo = TRUE}
+```{r week7}
 # Clean and append the next data set
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[7], 84, 54, w=7))
 ```
@@ -112,16 +112,32 @@ each sample on the day it was collected.
 ```{r WaterChemistryBiomass}
 # Load and clean the data in "ATS Treatment.xlsx"
 wcb_df <- WaterChemistryBiomass()
+
+# Display dadta for samples assayed both frozen and fresh
 kable(WaterChemistryBiomassDupes())
 
-# Save the cleaned data with duplicates removed.
-wcb_df <- wcb_df[c(1:2, 4, 6:12, 14, 16:55),]
-write_csv(wcb_df, wcb_fn)
+# Split the data into water chemistry and biomass productivity.
+wc_df <- wcb_df %>%
+    select(datetime, before, PO4P, TN, pH, frozen, assaydate, obsdate)
+bp_df <- wcb_df %>%
+    filter(!is.na(wet_biomass)) %>%
+    select(wet_biomass, dry_biomass, obsdate)
+
+#Save the cleaned water chemistry data with duplicates removed.
+wc_df <- wc_df[c(1:2, 4, 6:12, 14, 16:55),]
+write_csv(wc_df, wc_fn)
+
+# Save the cleaned biomass productivity data
+write_csv(bp_df, bp_fn)
 ```
 
 # Biomass Composition Data
 ```{r BiomassCompositionData}
+# Load biomass composition data from the spreadsheet. It is already clean.
 bc_df <- BiomassCompositionData()
+write_csv(bc_df, bc_fn)
+
+# Plot biomass composition data.
 PlotBiomassCompositionData(bc_df)
 PlotMeanBiomassCompositionData(bc_df)
 PlotMolarRatios(bc_df)

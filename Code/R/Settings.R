@@ -31,24 +31,24 @@ HOBO_fn <- paste0(csv_dir, c("ATS_1.11.09.18.csv",
 #fig_fn <- c("Visual Elements/Figures/Figure 1.png", "blah")
 #fig_fn <- c("Figures/Figure1.png", "Visual Elements/Figures/Figure2.png")
 
-# Spreadsheet of water chemistry and biomass observations
+# Spreadsheet of water chemistry and biomass
 sswc_fn <- paste0(ss_dir, "ATS Treatment.xlsx")
 
-# Spreadsheet of biomass composition data
+# Spreadsheet of biomass composition
 ssbc_fn <- paste0(ss_dir, "Analysen ZEA-3.xlsx")
 
-# OUTPUT FILENAMES
+# Output Files
 pre <- "FZJ WWTP ATS Pilot "
 ext <- ".csv"
 
-# Cleaned temperature and illumination observations
+# Cleaned temperature and illumination
 ti_fn <- paste0(csv_dir, pre, "Temperature and Illumination", ext)
 
-# Cleaned water chemistry and biomass observations
-wcb_fn <- paste0(csv_dir, pre, "Chemistry and Biomass", ext)
+# Cleaned water chemistry
+wc_fn <- paste0(csv_dir, pre, "Chemistry and Biomass", ext)
+
+# Cleaned biomass productivity
+bp_fn <- paste0(csv_dir, pre, "Biomass Productivity", ext)
 
 # Cleaned biomass composition
 bc_fn <- paste0(csv_dir, pre, "Pilot Biomass Composition", ext)
-
-# Biomass means and ratios
-bmr_fn <- paste0(csv_dir, pre, "Biomass Means and Ratios", ext)

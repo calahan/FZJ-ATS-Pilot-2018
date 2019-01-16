@@ -147,8 +147,10 @@ CleanHOBOData <- function(fn, l, r, w) {
     tb <- HOBOData(fn, view=FALSE, ret=TRUE, week=w)
     row_ct <- nrow(tb)
     HOBOData(fn, trim=c(l, r))
-    HOBOData(fn, trim=c(l, r), window=c(l-50, l+50))
-    HOBOData(fn, trim=c(l, r), window=c(row_ct-r-50, row_ct-r+50))
+
+    # Uncomment the next two lines to print higher detail
+    # HOBOData(fn, trim=c(l, r), window=c(l-50, l+50))
+    # HOBOData(fn, trim=c(l, r), window=c(row_ct-r-50, row_ct-r+50))
     return(tb[l:(row_ct-r),])
 }
 
