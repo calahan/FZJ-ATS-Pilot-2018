@@ -2,13 +2,11 @@
 #
 # Copyright 2018-2019 by Forschungszentrum-Jülich (FZ-J)
 #
-# This file is part of the internal publication "FZ-J WWTP Pilot" (FZJWWTPP), a
-# literate program that documents data cleaning procedures for the creation of several
-# data sets arising from a project, running from July 1 through August 31 2018,
-# that demonstrated operation of an algal turf scrubber at FZ-J's Jülich campus
-# wastewater treatment plant.
+# This file is part of the publication "FZ-J WWTP ATS Pilot Data 2018" (FWAPD-2018), a
+# data set documenting an algal turf scrubbing pilot project, operating Jul. 1 - Aug. 31 2018,
+# treating secondary sewage at FZ-J's Jülich campus wastewater treatment plant.
 #
-# The software component of FZJWWTPP is open access: you can redistribute it and/or
+# The software component of FWAPD-2018 is open access: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published by the
 # Free Software Foundation, either version 3 of the License, or (at your option)
 # any later version.
@@ -25,24 +23,20 @@
 
 # Functions to support analysis of data from FZ-J WWTP ATS Pilot
 
-HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), window=c(NA, NA), view=TRUE, text=FALSE, ret=FALSE, week=NA) {
 # Load and optionally trim or plot data from a HOBO data logger.
+# i: fn        Name of HOBO csv file to load
+#    zone      Time zone of HOBO readings
+#    view      Whether to plot the data
+#    window    Beginning and end indices of data to plot (if view==TRUE)
+#    text      Display console text with HOBO observation count?
+#    ret       Whether to return the trimmed dataset
+#    trim      Number of observations to remove from beginning and end before returning data
+#    week      Week index represented by fn
+# v:           If ret == TRUE, a tibble containing the HOBO data from the specified file, with first
+#              and last data elided according to trim.
+# s:           A plot is generated if view == TRUE, text is displayed if text == TRUE
 #
-# i:
-# fn        Name of the HOBO csv file to load
-# zone      Time zone in which the HOBO readings were recorded
-# trim      Number of observations to remove from beginning and end of data
-# window    Beginning and end indices of data to plot (if view==TRUE)
-# view      Whether to plot the data
-# text      Whether to display text with count of observations in the csv file
-# ret       Whether to return the trimmed dataset
-# week      Which week is represented by this file
-#
-# o:        If requested, a tibble containing the HOBO data from the specified file, with first
-#           and last data elided.
-#
-# s:        A plot is generated if requested, displaying the data within the specified window
-#
+HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), window=c(NA, NA), view=TRUE, text=FALSE, ret=FALSE, week=NA) {
     tb <- read_csv(fn, skip=2, col_names=c(
         "id",
         "date",
@@ -62,25 +56,23 @@ HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), window=c(NA, NA),
 
     row_ct <- nrow(tb)
 
-    # Adjust trim[2] to reflect the index, not the number of observations to remove
+    # subset of data to return or plot
     if(is.na(trim[1])) {
         trim <- c(0, row_ct)
     } else {
-    trim <- c(trim[1], row_ct - trim[2])
+        trim <- c(trim[1], row_ct - trim[2])
     }
 
-    # If window was not supplied, set it to include the entire data set
-    if(is.na(window[1])) {
-        window <- c(1, row_ct)
-    }
-
-    # Output the text if desired
+    # Output diagnostic text if text == TRUE
     if(text) {
         cat(paste0(fn, ": ", nrow(tb), " ", "observations\n"))
     }
 
-    # Plot the data if desired
+    # Plot the data if view == TRUE
     if(view) {
+        if(is.na(window[1])) {
+            window <- c(1, row_ct)
+        }
         par(mfrow=c(1,2))
         par(ps = 12, cex = 1, cex.main = 1)
 
@@ -116,33 +108,27 @@ HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), window=c(NA, NA),
 
     }
 
-    # If week number was supplied, create a column with it
+    # If week index was supplied, create a column for it
     if(!is.na(week)) {
         tb$week <- week
     }
 
-    # Return the data within the window.
+    # Return the data defined by window.
     if(ret) {
         return(tb[trim[1]:trim[2],])
     }
 }
 
+# i: fn     name of the csv file to clean
+#    l      index of the first observaton to keep
+#    r      index of the last observation to keep
+#    w      2-element vector of the window to plot if view == TRUE
+# v:        Cleaned data tibble
+# s:        Three pairs of plots: one showing all data with vertical lines at clean
+#           data boundaries, one pair zoomed in to the early cutoff zone, and one
+#           pair zoomed in to the late one
+#
 CleanHOBOData <- function(fn, l, r, w) {
-#
-# input:
-# fn    name of the csv file to clean
-# l     index of the first observaton to keep
-# r     index of the last observation to keep
-# w     2-element vector of the window to display
-#
-# side effects:
-# Three pairs of plots are produced: one pair showing all data with vertical lines
-# at the cutoff observations, one pair zoomed in to the early cutoff zone, and one
-# pair zoomed in to the late cutoff zone
-#
-# value:
-# A tibble of the cleaned data
-#
     tb <- HOBOData(fn, view=FALSE, ret=TRUE, week=w)
     row_ct <- nrow(tb)
     HOBOData(fn, trim=c(l, r))
@@ -153,16 +139,15 @@ CleanHOBOData <- function(fn, l, r, w) {
     return(tb[l:(row_ct-r),])
 }
 
+# Create a data frame representing integrated temperature x irradiance.
+# i: d      the observation date
+#    df1    data frame containing observations of one variable (e.g. temp)
+#    df2    data frame containing observations of the other variable (e.g. irrad)
+#    diag   whether to display diagnostic information
+# v:        The sum of the integrated units (e.g. degree minutes) inclusive of the
+#           first and last measurements for that day.
+#
 IntegrateObs <- function(d, df1, df2, diag=FALSE) {
-#
-# i:
-# d   the observation date
-# diag  whether to print diagnostic information
-#
-# v:
-# The number of degree minutes between the first observation time of day and the
-# first observation time of the previous day.
-#
     # Day 1 is an error because there was no previous sample
     if(d == 1) {
         stop("Day 1 illegal")
@@ -194,11 +179,12 @@ IntegrateObs <- function(d, df1, df2, diag=FALSE) {
 }
 
 # Create a cleaned data frame from the spreadsheet "ATS Treatment"
-WaterChemistryBiomass <- function() {
+# [todo]
 # i: NA
 # v: A cleaned data frame containing results from water chemistry analsysis
 # s: Creation of the csv file "FZJ WWTP ATS Pilot Chemistry and Biomass.csv"
 
+WaterChemistryBiomass <- function() {
     # Read the spreadsheet
     t_df <- read_excel(sswc_fn,
                        sheet="Tabelle1",
