@@ -2,24 +2,23 @@
 #
 # Copyright 2018-2019 by Forschungszentrum-Jülich (FZ-J)
 #
-# This file is part of the internal publication "FZ-J WWTP ATS Pilot" (FZJWWTPAP), a
-# literate program that documents data cleaning procedures for the creation of several
-# data sets arising from a project, running from August 18 through October 18 2018,
-# that demonstrated operation of an algal turf scrubber at FZ-J's Jülich campus
-# wastewater treatment plant.
+# This file is part of the publication "FZJ ATS Pilot 2018" (FZJAP2018), a data
+# set documenting the results of an algal turf scrubbing pilot project performed
+# 15.07-15.09 2018, treating secondary sewage at FZ-J's campus wastewater treatment
+# plant.
 #
-# The software component of FZJWWTPAP is open access: you can redistribute it and/or
+# The software component of FZJAP2018 is open access: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published by the
 # Free Software Foundation, either version 3 of the License, or (at your option)
 # any later version.
 
-# The software component of FZJWWTPAP is distributed in the hope that it will be
+# The software component of FZJAP2018 is distributed in the hope that it will be
 # useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 # details.
 #
 # You should have received a copy of the GNU General Public License along with the
-# software component of FZJWWTPP If not, see <http://www.gnu.org/licenses/>.
+# software component of FZJAP2018. If not, see <http://www.gnu.org/licenses/>.
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 

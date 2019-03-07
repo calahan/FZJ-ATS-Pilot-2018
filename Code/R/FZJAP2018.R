@@ -2,26 +2,61 @@
 #
 # Copyright 2018-2019 by Forschungszentrum-Jülich (FZ-J)
 #
-# This file is part of the publication "FZ-J WWTP ATS Pilot Data 2018" (FWAPD-2018), a
-# data set documenting an algal turf scrubbing pilot project, operating Jul. 1 - Aug. 31 2018,
-# treating secondary sewage at FZ-J's Jülich campus wastewater treatment plant.
+# This file is part of the publication "FZJ ATS Pilot 2018" (FZJAP2018), a data
+# set documenting the results of an algal turf scrubbing pilot project performed
+# 15.07-15.09 2018, treating secondary sewage at FZ-J's campus wastewater treatment
+# plant.
 #
-# The software component of FWAPD-2018 is open access: you can redistribute it and/or
+# The software component of FZJAP2018 is open access: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published by the
 # Free Software Foundation, either version 3 of the License, or (at your option)
 # any later version.
 
-# The software component of FZJWWTPP is distributed in the hope that it will be
+# The software component of FZJAP2018 is distributed in the hope that it will be
 # useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 # details.
 #
 # You should have received a copy of the GNU General Public License along with the
-# software component of FZJWWTPP If not, see <http://www.gnu.org/licenses/>.
+# software component of FZJAP2018. If not, see <http://www.gnu.org/licenses/>.
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-# Functions to support analysis of data from FZ-J WWTP ATS Pilot
+# Functions
+# BiomassCompositionData : function ()
+# CleanHOBOData : function (fn, l, r, w)
+# HOBOData : function (fn, zone = "Europe/Berlin", trim = c(NA, NA), window = c(NA, NA), view = TRUE, text = FALSE, ret = FALSE, week = NA)
+# IntegrateObs : function (d, df1, df2, diag = FALSE)
+# MeanBiomassComposition : function (df)
+# PlotBiomassCompositionData : function (df)
+# PlotMeanBiomassCompositionData : function (df)
+# PlotMolarRatios : function (df)
+# WaterChemistryBiomass : function ()
+# WaterChemistryBiomassDupes : function ()
+
+BiomassCompositionData <- function() {
+    return(read_excel(ssbc_fn,
+                      sheet="Tabelle1",
+                      skip=18,
+                      col_names=c("id",
+                                  "date",
+                                  "Smw",
+                                  "Ssd",
+                                  "Pmw",
+                                  "Psd",
+                                  "Kmw",
+                                  "Ksd",
+                                  "Camw",
+                                  "Casd",
+                                  "Mgmw",
+                                  "Mgsd",
+                                  "Mnmw",
+                                  "Mnsd",
+                                  "Cmw",
+                                  "Csd",
+                                  "Nmw",
+                                  "Nsd")))
+}
 
 # Load and optionally trim or plot data from a HOBO data logger.
 # i: fn        Name of HOBO csv file to load
@@ -276,29 +311,6 @@ WaterChemistryBiomassDupes <- function() {
     return(dupedeltas_df)
 }
 
-BiomassCompositionData <- function() {
-    return(read_excel(ssbc_fn,
-                      sheet="Tabelle1",
-                      skip=18,
-                      col_names=c("id",
-                                  "date",
-                                  "Smw",
-                                  "Ssd",
-                                  "Pmw",
-                                  "Psd",
-                                  "Kmw",
-                                  "Ksd",
-                                  "Camw",
-                                  "Casd",
-                                  "Mgmw",
-                                  "Mgsd",
-                                  "Mnmw",
-                                  "Mnsd",
-                                  "Cmw",
-                                  "Csd",
-                                  "Nmw",
-                                  "Nsd")))
-}
 
 PlotBiomassCompositionData <- function(df) {
     atoms <- c("C", "Ca", "K","Mg", "Mn", "N", "P", "S")
