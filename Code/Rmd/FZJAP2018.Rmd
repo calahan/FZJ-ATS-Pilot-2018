@@ -21,6 +21,10 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 source("Code/R/Settings.R")
 source("Code/R/FZJAP2018.R")
 
+# Execute the following command to knit, rather than use the knit button.
+# rmarkdown::render("Code/Rmd/FZJ ATS Pilot 2018 Data Cleaning.Rmd", output_dir="Drafts", output_format = c("html_document",  "pdf_document", "word_document"))
+#
+# [todo] Figure out whether the Word errors when running the above command are what is keeping this from working:
 # title: "multiple outputs"
 # output:
 #   word_document: default
@@ -28,7 +32,6 @@ source("Code/R/FZJAP2018.R")
 # knit: (function(inputFile, encoding) {
 #   rmarkdown::render(inputFile, encoding = encoding,
 #   output_dir = "output", output_format = "all") })
-# rmarkdown::render("Code/Rmd/FZJ ATS Pilot 2018 Data Cleaning.Rmd", output_dir="output", output_format = c("html_document",  "pdf_document", "word_document"))
 ```
 # Introduction  
 Here we clean the data from the 2018 ATS pilot at Forschungszentrum-Jülich and generate
