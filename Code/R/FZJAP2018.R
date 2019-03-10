@@ -218,7 +218,7 @@ IntegrateObs <- function(d, df1, df2, diag=FALSE) {
 # i: NA
 # v: A cleaned data frame containing results from water chemistry analsysis
 # s: Creation of the csv file "FZJ WWTP ATS Pilot Chemistry and Biomass.csv"
-
+#
 WaterChemistryBiomass <- function() {
     # Read the spreadsheet
     t_df <- read_excel(sswc_fn,
