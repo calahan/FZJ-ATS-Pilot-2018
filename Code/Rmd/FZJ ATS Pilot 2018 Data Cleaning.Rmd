@@ -1,10 +1,16 @@
 ---
 title: 'FZJ ATS Pilot 2018'
 author:
-- Dean Calahan^[Smithsonian Institution]
-- Isabel Meuser, Ladislav Nedbal^[Forschungszentrum Jülich]
+- Dean Calahan^[Smithsonian Institution, Forschungszentrum Jülich]
+- Isabel Meuser and Ladislav Nedbal^[Forschungszentrum Jülich]
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: pdf_document
+output:
+    pdf_document: default
+    word_document: default
+knit: (function(inputFile) {
+  rmarkdown::render(inputFile,
+  output_dir = "output",
+  output_format = c("html_document", "pdf_document", "word_document") })
 ---
 
 ```{r setup, include=FALSE}
@@ -14,6 +20,15 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```{r initialize}
 source("Code/R/Settings.R")
 source("Code/R/FZJAP2018.R")
+
+# title: "multiple outputs"
+# output:
+#   word_document: default
+#   html_document: default
+# knit: (function(inputFile, encoding) {
+#   rmarkdown::render(inputFile, encoding = encoding,
+#   output_dir = "output", output_format = "all") })
+# rmarkdown::render("Code/Rmd/FZJ ATS Pilot 2018 Data Cleaning.Rmd", output_dir="output", output_format = c("html_document",  "pdf_document", "word_document"))
 ```
 # Introduction  
 Here we clean the data from the 2018 ATS pilot at Forschungszentrum-Jülich and generate
