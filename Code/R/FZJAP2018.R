@@ -34,6 +34,10 @@
 # WaterChemistryBiomass : function ()
 # WaterChemistryBiomassDupes : function ()
 
+# Load biomass composition data from spreadsheet
+# i: args   List of function arguments maintained in Setup.R
+# v:        Tidy data frame of biomass composition data
+# s:        NA
 BiomassCompositionData <- function(args) {
     # Load ss.
     df <- read_excel(path =      args[["fn"]],
@@ -175,6 +179,17 @@ CleanHOBOData <- function(fn, l, r, w) {
     return(tb[l:(row_ct-r),])
 }
 
+# Create data frames of the data dictionaries
+# i: bc     biomass composition data frame
+#    bp     biomass productivity data frame
+#    ti     temperature and illumination data frame
+#    wc     water chemistry data frame
+# v:        list of data dictionary data frames
+# s:        NA
+DataDictionaries <- function(bc, bp, ti, wc) {
+
+}
+
 # Create a data frame representing integrated temperature x irradiance.
 # i: d      the observation date
 #    df1    data frame containing observations of one variable (e.g. temp)
@@ -182,6 +197,7 @@ CleanHOBOData <- function(fn, l, r, w) {
 #    diag   whether to display diagnostic information
 # v:        The sum of the integrated units (e.g. degree minutes) inclusive of the
 #           first and last measurements for that day.
+# s:        NA
 #
 IntegrateObs <- function(d, df1, df2, diag=FALSE) {
     # Day 1 is an error because there was no previous sample
@@ -313,85 +329,100 @@ WaterChemistryBiomassDupes <- function() {
 }
 
 
+MeanBiomassComposition <- function(df) {
+    # return(df %>% summarize(Cmean = mean(Cmw, na.rm=TRUE), Csd = sd(Cmw, na.rm=TRUE),
+    #                         Nmean = mean(Nmw), Nsd = sd(Nmw),
+    #                         Mgmean = mean(Mgmw), Mgsd = sd(Mgmw),
+    #                         Pmean = mean(Pmw), Psd = sd(Pmw),
+    #                         Smean = mean(Smw), Ssd = sd(Smw),
+    #                         Kmean = mean(Kmw), Ksd = sd(Kmw),
+    #                         Camean = mean(Camw), Casd = sd(Camw),
+    #                         Mnmean = mean(Mnmw), Mnsd = sd(Mnmw)))
+
+    return(df %>%
+               group_by(atom) %>%
+               summarize(mean = mean(proportion),
+                         sd = sd(proportion)))
+}
+
 PlotBiomassCompositionData <- function(df) {
-    atoms <- c("C", "Ca", "K","Mg", "Mn", "N", "P", "S")
-    masses <- setNames(mass(atoms), atoms)
-
-    val_cols <- c("Cmw", "Nmw", "Mgmw", "Pmw", "Smw", "Kmw", "Camw", "Mnmw")
-    sel_cols <- c("date", "reading", "val")
-
-    # "NAs introduced by coercion" warning is OK.
-    sd <- suppressWarnings(as.numeric(with(df, c(Csd, Nsd, Mgsd, Psd, Ssd, Ksd, Casd, Mnsd))))
+    atoms <- sort(unique(df$atom))
+    #    masses <- setNames(mass(atoms), atoms)
 
     plot_df <- df %>%
-        gather_(key="reading", value="val", gather_cols=val_cols) %>%
-        select(sel_cols)
-    plot_df$sd <- sd
+        gather_(key="reading", value="value", gather_cols=c("proportion")) %>%
+        select(date, atom, value, sd)
+
 
     # Plot weight percents of biomass composition readings with their standard deviations.
-    return(ggplot(plot_df, aes(x=date, y=val, fill=reading)) +
-        geom_bar(stat="identity", position=position_dodge()) +
-        geom_errorbar(aes(ymin=val-sd, ymax=val+sd),
-                      position=position_dodge(),
-                      na.rm=TRUE))
+    return(ggplot(plot_df, aes(x=date, y=value, fill=atom)) +
+               geom_bar(stat="identity", position=position_dodge()) +
+               geom_errorbar(aes(ymin=value-sd, ymax=value+sd),
+                             position=position_dodge(),
+                             na.rm=TRUE))
 }
 
-MeanBiomassComposition <- function(df) {
-    return(df %>% summarize(Cmean = mean(Cmw, na.rm=TRUE), Csd = sd(Cmw, na.rm=TRUE),
-                            Nmean = mean(Nmw), Nsd = sd(Nmw),
-                            Mgmean = mean(Mgmw), Mgsd = sd(Mgmw),
-                            Pmean = mean(Pmw), Psd = sd(Pmw),
-                            Smean = mean(Smw), Ssd = sd(Smw),
-                            Kmean = mean(Kmw), Ksd = sd(Kmw),
-                            Camean = mean(Camw), Casd = sd(Camw),
-                            Mnmean = mean(Mnmw), Mnsd = sd(Mnmw)))
-}
-
+# Plot means+sd of biomass composition.
+# i: df     Biomass composition data frame
+# v:        The plot
+# s:        NA
 PlotMeanBiomassCompositionData <- function(df) {
-    mean_df <- MeanBiomassComposition(df)
+    mbc_df <- MeanBiomassComposition(df)
 
-    val_cols <- c("Cmean", "Nmean", "Mgmean", "Pmean", "Smean", "Kmean", "Camean", "Mnmean")
-    atom_labs <- c("C", "N", "Mg", "P", "S", "K", "Ca", "Mn")
-    sd <- with(mean_df, c(Csd, Nsd, Mgsd, Psd, Ssd, Ksd, Csd, Mnsd))
-    sel_cols <- c("reading", "val")
+    # val_cols <- c("Cmean", "Nmean", "Mgmean", "Pmean", "Smean", "Kmean", "Camean", "Mnmean")
+    # sd <- with(mean_df, c(Csd, Nsd, Mgsd, Psd, Ssd, Ksd, Csd, Mnsd))
+    # sel_cols <- c("reading", "val")
 
-    mean_df <- mean_df %>%
-        gather_(key="reading", value="val", val_cols) %>%
-        select(sel_cols)
+    # mbc_df <- mbc_df %>%
+    #     gather_(key="reading", value="value", c("mean")) %>%
+    #     select(sel_cols)
 
     # ggplot orders x axis alphabetically for labels, but with factors we can order at will
     # get order of readings
-    ro <- order(mean_df$val, decreasing = TRUE)
-    reading <- atom_labs[ro]
-    mean_df$reading <- factor(atom_labs, levels=reading)
+    mean_order <- order(mbc_df$mean, decreasing = TRUE)
+    atoms <- mbc_df$atom[mean_order]
+    mbc_df$reading <- factor(mbc_df$atom, levels=atoms)
 
-    return(ggplot(mean_df, aes(x=reading, y=val)) +
+    return(ggplot(mbc_df, aes(x=reading, y=mean)) +
         geom_bar(stat="identity", position=position_dodge()) +
-        geom_errorbar(aes(ymin=val-sd, ymax=val+sd),
+        geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd),
                       position=position_dodge()))
 }
 
 PlotMolarRatios <- function(df) {
     # Molar ratios
-    mean_df <- MeanBiomassComposition(df)
-    atoms <- c("C", "N", "Mg", "P", "S", "K", "Ca", "Mn")
-    masses <- setNames(mass(atoms), atoms)
+    mbc_df <- MeanBiomassComposition(df)
+    # atoms <- c("C", "N", "Mg", "P", "S", "K", "Ca", "Mn")
+    #atoms <- mbc_df$atom
+    mbc_df <- mbc_df %>%
+        mutate(mass = mass(mbc_df$atom)) %>%
+        mutate(molar = mean/mass)
 
-    molar_v <- with(mean_df,
-                     c(Cmean, Nmean, Mgmean, Pmean, Smean, Kmean, Camean, Mnmean)/
-                         sort(masses))
-    molar_v <- molar_v/molar_v[["P"]]
+    molrat_p <- (mbc_df %>% filter(atom == "P"))$molar
+    mbc_df <- mbc_df %>%
+        mutate(molarP = molar / molrat_p) %>%
+        mutate(molarPsd = sd * molar * molrat_p)
 
-    molar_df <- data.frame(atom = names(molar_v), val = molar_v)
+    # molar_v <- with(mean_df,
+    #                  c(Cmean, Nmean, Mgmean, Pmean, Smean, Kmean, Camean, Mnmean)/
+    #                      sort(masses))
+    # molar_v <- molar_v/molar_v[["P"]]
+
+    # molar_df <- data.frame(atom = names(molar_v), val = molar_v)
 
     # ggplot orders x axis alphabetically for labels, but with factors we can order at will
     # get order of readings
-    ro <- order(molar_df$val, decreasing = TRUE)
-    atoms <- atoms[ro]
-    molar_df$atom <- factor(atoms, levels=atoms)
-    molar_df$val <- molar_df[ro,]$val
+    reading_order <- order(mbc_df$molarP, decreasing = TRUE)
+    atoms <- mbc_df$atom[reading_order]
+    means <- mbc_df$molarP[reading_order]
+    sds <- mbc_df$molarPsd[reading_order]
 
-    return(ggplot(molar_df, aes(x=atom, y=val)) +
-        geom_bar(stat="identity", position=position_dodge()))
+    plot_df <- data.frame(atom = factor(atoms, levels=atoms),
+                          mean = mbc_df[reading_order,]$molarP,
+                          sd = mbc_df[reading_order,]$molarPsd)
 
+    return(ggplot(plot_df, aes(x=atom, y=mean)) +
+        geom_bar(stat="identity", position=position_dodge()) +
+        geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd),
+                      position=position_dodge()))
 }

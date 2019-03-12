@@ -72,43 +72,43 @@ retained.
 ## HOBO Data. `Week # (name of data logger)`
 ### Week 1 (ATS_1)  
 ```{r week1}
-# Create initial cleaned data set
+# Create cleaned data set from the first week.
 ti_df <- CleanHOBOData(HOBO_fn[1], 1010, 365, w=1)
 ```
 
 ### Week 2 (ATS_2)  
 ```{r week2}
-# Clean and append the next data set
+# Clean and append the data set from the following week.
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[2], 9773, 271, w=2))
 ```
 
 ### Week 3 (ATS_1)  
 ```{r week3}
-# Clean and append the next data set
+# Clean and append the data set from the following week.
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[3], 119, 96, w=3))
 ```
 
 ### Week 4 (ATS_2)  
 ```{r week4}
-# Clean and append the next data set
+# Clean and append the data set from the following week.
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[4], 107, 227, w=4))
 ```
 
 ### Week 5 (ATS_1)  
 ```{r week5}
-# Clean and append the next data set
+# Clean and append the data set from the following week.
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[5], 107, 227, w=5))
 ```
 
 ### Week 6 (ATS_2)  
 ```{r week6}
-# Clean and append the next data set
+# Clean and append the data set from the following week.
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[6], 121, 65, w=6))
 ```
 
 ### Week 7 (ATS_1)  
 ```{r week7}
-# Clean and append the next data set
+# Clean and append the data set from the following week.
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[7], 84, 54, w=7))
 ```
 ```{r save_ti}
@@ -159,38 +159,23 @@ PlotMolarRatios(bc_df)
 ```
 
 # Data Dictionaries  
-                           `FZJ WWTP ATS Pilot Biomass Composition.csv`  
-
+                           `r bc_fn`  
 Column           | Description  
 -----------------| -----------
 id               | Assay id  
 date             | Assay date  
-Smw              | Sulfur weight percent  
-Ssd              | Sulfur weight percent standard deviation  
-Pmw              | Phosphorus weight percent  
-Psd              | Phosphorus weight percent standard deviation  
-Kmw              | Potassium weight percent  
-Ksd              | Potassium weight percent standard deviation  
-Camw             | Calcium weight percent  
-Casd             | Calcium weight percent standard deviation  
-Mgmw             | Magnesium weight percent  
-Mgsd             | Magnesium weight percent standard deviation  
-Mnmw             | Manganese weight percent  
-Mnsd             | Manganese weight percent standard deviation  
-Cmw              | Carbon weight percent  
-Csd              | Carbon weight percent standard deviation  
-Nmw              | Nitrogen weight percent  
-Nsd              | Nitrogen weight percent standard deviation  
+atom             | Assayed element
+proportion       | Weight percent of atom  
+sd               | Standard deviation of proportion
 
-                          `FZJ WWTP ATS Pilot Biomass Productivity.csv`  
-
+                          `r bp_fn`  
 Column           | Description  
 ---------------- | --------------  
 wet_biomass      | Biomass weight as harvested  
 dry_biomass      | Biomass weight after drying  
 obsdate          | Date of biomass harvest  
 
-                           `FZJ WWTP ATS Pilot Temperature and Irradiance.csv`  
+                           `r ti_fn`  
 Column     | Description  
 ---------- | --------------  
 datetime   | Date and time of observation  
@@ -198,7 +183,7 @@ temp       | Temperature, °C
 lux        | Irradiance, lux  
 week       | Week number  
 
-                           `FZJ WWTP ATS Pilot Water Chemistry.csv`  
+                           `r wc_fn`  
 Column     | Description  
 ---------- | --------------  
 datetime   | Date and time of observation  

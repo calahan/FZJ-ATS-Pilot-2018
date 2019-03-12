@@ -57,12 +57,17 @@ sswc_fn <- paste0(ss_dir, "ATS Treatment.xlsx")  # water chemistry and biomass
 ssbc_fn <- paste0(ss_dir, "Analysen ZEA-3.xlsx") # of biomass composition
 
 # o: csv files
-pre <- "FZJ WWTP ATS Pilot "
+pre <- "FZJAP2018 "
 csv <- ".csv"
-ti_fn <- paste0(csv_dir, pre, "Temperature and Irradiance", csv)  # temperature and irradiance
-wc_fn <- paste0(csv_dir, pre, "Water Chemistry", csv)             # water chemistry
-bp_fn <- paste0(csv_dir, pre, "Biomass Productivity", csv)        # biomass productivity
-bc_fn <- paste0(csv_dir, pre, "Biomass Composition", csv)         # biomass composition
+dataset <- list("ti" = "Temperature and Irradiance",
+                "wc" = "Water Chemistry",
+                "bp" = "Biomass Productivity",
+                "bc" = "Biomass Composition")
+
+ti_fn <- paste0(csv_dir, pre, dataset[["ti"]], csv)     # temperature and irradiance
+wc_fn <- paste0(csv_dir, pre, dataset[["wc"]], csv)     # water chemistry
+bp_fn <- paste0(csv_dir, pre, dataset[["bp"]], csv)     # biomass productivity
+bc_fn <- paste0(csv_dir, pre, dataset[["bc"]], csv)     # biomass composition
 
 # function call parameters
 bcd <- list("fn" = ssbc_fn,
