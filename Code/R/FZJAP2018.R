@@ -328,23 +328,21 @@ WaterChemistryBiomassDupes <- function() {
     return(dupedeltas_df)
 }
 
-
+# Compute mean biomass composition.
+# i: df     Biomass composition data frame
+# v:        Data frame with means and standard deviations
+# s:        NA
 MeanBiomassComposition <- function(df) {
-    # return(df %>% summarize(Cmean = mean(Cmw, na.rm=TRUE), Csd = sd(Cmw, na.rm=TRUE),
-    #                         Nmean = mean(Nmw), Nsd = sd(Nmw),
-    #                         Mgmean = mean(Mgmw), Mgsd = sd(Mgmw),
-    #                         Pmean = mean(Pmw), Psd = sd(Pmw),
-    #                         Smean = mean(Smw), Ssd = sd(Smw),
-    #                         Kmean = mean(Kmw), Ksd = sd(Kmw),
-    #                         Camean = mean(Camw), Casd = sd(Camw),
-    #                         Mnmean = mean(Mnmw), Mnsd = sd(Mnmw)))
-
     return(df %>%
                group_by(atom) %>%
                summarize(mean = mean(proportion),
                          sd = sd(proportion)))
 }
 
+# Plot biomass composition data by mass ratio
+# i: df     Biomass composition data frame
+# v:        The plot
+# s:        NA
 PlotBiomassCompositionData <- function(df) {
     atoms <- sort(unique(df$atom))
     #    masses <- setNames(mass(atoms), atoms)
@@ -369,18 +367,9 @@ PlotBiomassCompositionData <- function(df) {
 PlotMeanBiomassCompositionData <- function(df) {
     mbc_df <- MeanBiomassComposition(df)
 
-    # val_cols <- c("Cmean", "Nmean", "Mgmean", "Pmean", "Smean", "Kmean", "Camean", "Mnmean")
-    # sd <- with(mean_df, c(Csd, Nsd, Mgsd, Psd, Ssd, Ksd, Csd, Mnsd))
-    # sel_cols <- c("reading", "val")
-
-    # mbc_df <- mbc_df %>%
-    #     gather_(key="reading", value="value", c("mean")) %>%
-    #     select(sel_cols)
-
-    # ggplot orders x axis alphabetically for labels, but with factors we can order at will
-    # get order of readings
-    mean_order <- order(mbc_df$mean, decreasing = TRUE)
-    atoms <- mbc_df$atom[mean_order]
+    # ggplot orders x axis alphabetically, but with factors we order at will
+    plot_order <- order(mbc_df$mean, decreasing = TRUE)
+    atoms <- mbc_df$atom[plot_order]
     mbc_df$reading <- factor(mbc_df$atom, levels=atoms)
 
     return(ggplot(mbc_df, aes(x=reading, y=mean)) +
@@ -389,37 +378,31 @@ PlotMeanBiomassCompositionData <- function(df) {
                       position=position_dodge()))
 }
 
+# Convert atomic mass ratios to molar ratios and plot
+# i: df     Biomass composition data frame
+# v:        The plot
+# s:        NA
 PlotMolarRatios <- function(df) {
-    # Molar ratios
-    mbc_df <- MeanBiomassComposition(df)
-    # atoms <- c("C", "N", "Mg", "P", "S", "K", "Ca", "Mn")
-    #atoms <- mbc_df$atom
-    mbc_df <- mbc_df %>%
-        mutate(mass = mass(mbc_df$atom)) %>%
+    # Calculate molar ratios and append them to df.
+    df <- MeanBiomassComposition(df)
+    df <- df %>%
+        mutate(mass = mass(df$atom)) %>%
         mutate(molar = mean/mass)
 
-    molrat_p <- (mbc_df %>% filter(atom == "P"))$molar
-    mbc_df <- mbc_df %>%
+    molrat_p <- (df %>% filter(atom == "P"))$molar
+    df <- df %>%
         mutate(molarP = molar / molrat_p) %>%
         mutate(molarPsd = sd * molar * molrat_p)
 
-    # molar_v <- with(mean_df,
-    #                  c(Cmean, Nmean, Mgmean, Pmean, Smean, Kmean, Camean, Mnmean)/
-    #                      sort(masses))
-    # molar_v <- molar_v/molar_v[["P"]]
-
-    # molar_df <- data.frame(atom = names(molar_v), val = molar_v)
-
-    # ggplot orders x axis alphabetically for labels, but with factors we can order at will
-    # get order of readings
-    reading_order <- order(mbc_df$molarP, decreasing = TRUE)
-    atoms <- mbc_df$atom[reading_order]
-    means <- mbc_df$molarP[reading_order]
-    sds <- mbc_df$molarPsd[reading_order]
+    # ggplot orders x axis labels alphabetically, but with factors we order at will
+    plot_order <- order(df$molarP, decreasing = TRUE)
+    atoms <- df$atom[plot_order]
+    means <- df$molarP[plot_order]
+    sds <- df$molarPsd[plot_order]
 
     plot_df <- data.frame(atom = factor(atoms, levels=atoms),
-                          mean = mbc_df[reading_order,]$molarP,
-                          sd = mbc_df[reading_order,]$molarPsd)
+                          mean = df[plot_order,]$molarP,
+                          sd = df[plot_order,]$molarPsd)
 
     return(ggplot(plot_df, aes(x=atom, y=mean)) +
         geom_bar(stat="identity", position=position_dodge()) +

@@ -158,39 +158,60 @@ PlotMeanBiomassCompositionData(bc_df)
 PlotMolarRatios(bc_df)
 ```
 
-# Data Dictionaries  
-                           `r bc_fn`  
-Column           | Description  
------------------| -----------
-id               | Assay id  
-date             | Assay date  
-atom             | Assayed element
-proportion       | Weight percent of atom  
-sd               | Standard deviation of proportion
+# Data Dictionaries 
 
-                          `r bp_fn`  
-Column           | Description  
----------------- | --------------  
-wet_biomass      | Biomass weight as harvested  
-dry_biomass      | Biomass weight after drying  
-obsdate          | Date of biomass harvest  
+```{r bcdd}
+# id
+# date
+# atom
+# proportion
+# sd
+kable(data.frame(Column = colnames(bc_df),
+                 Description = c("Observation ID",
+                                 "Harvest date",
+                                 "Element assayed",
+                                 "Mass proportion of element in sample",
+                                 "Standard deviation with n = 2")),
+      caption = bc_fn)
 
-                           `r ti_fn`  
-Column     | Description  
----------- | --------------  
-datetime   | Date and time of observation  
-temp       | Temperature, °C  
-lux        | Irradiance, lux  
-week       | Week number  
+# wet_biomass
+# dry_biomass
+# obsdate
+kable(data.frame(Column = colnames(bp_df),
+                 Description = c("Mass of total fresh biomass harvested",
+                                 "Mass of total dried biomass",
+                                 "Harvest date")),
+      caption = bp_fn)
 
-                           `r wc_fn`  
-Column     | Description  
----------- | --------------  
-datetime   | Date and time of observation  
-before     | Was the sample taken before or after water exchange?  
-PO4P       | Phosphate phosphorus, mg L-1  
-TN         | Total nitrogen, mg L-1  
-pH         | pH  
-frozen     | Was the assay performed on a frozen sample?  
-assaydate  | Date of assay  
-obsdate    | Date of observation  
+# datetime
+# temp
+# lux
+# week
+kable(data.frame(Column = colnames(ti_df),
+                 Description = c("Date and time of observation",
+                                 "Temperature (°C)",
+                                 "Irradiance (lux)",
+                                 "Week index")),
+      caption = ti_fn)
+
+# datetime
+# before
+# PO4P
+# TN
+# pH
+# frozen
+# assaydate
+# obsdate
+kable(data.frame(Column = colnames(wc_df),
+                 Description = c("Date and time of observation",
+                                 "Was this sample taken before or after water exchange?",
+                                 "Soluble P04, mg L-1",
+                                 "Total N, mg L-1",
+                                 "ph",
+                                 "Was this sample frozen?",
+                                 "Date sample was assayed",
+                                 "Observation date")),
+      caption = wc_fn)
+
+
+```
