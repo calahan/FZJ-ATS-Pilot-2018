@@ -11,7 +11,7 @@
 # modify it under the terms of the GNU General Public License as published by the
 # Free Software Foundation, either version 3 of the License, or (at your option)
 # any later version.
-
+#
 # The software component of FZJAP2018 is distributed in the hope that it will be
 # useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
@@ -34,28 +34,29 @@
 # WaterChemistryBiomass : function ()
 # WaterChemistryBiomassDupes : function ()
 
-BiomassCompositionData <- function() {
-    return(read_excel(ssbc_fn,
-                      sheet="Tabelle1",
-                      skip=18,
-                      col_names=c("id",
-                                  "date",
-                                  "Smw",
-                                  "Ssd",
-                                  "Pmw",
-                                  "Psd",
-                                  "Kmw",
-                                  "Ksd",
-                                  "Camw",
-                                  "Casd",
-                                  "Mgmw",
-                                  "Mgsd",
-                                  "Mnmw",
-                                  "Mnsd",
-                                  "Cmw",
-                                  "Csd",
-                                  "Nmw",
-                                  "Nsd")))
+BiomassCompositionData <- function(args) {
+    # Load ss.
+    df <- read_excel(path =      args[["fn"]],
+                     sheet =     args[["sheet"]],
+                     skip=       args[["skip"]],
+                     col_names = args[["col_names"]])
+
+    # Tidy ss data.
+    tprop <- df %>%
+        gather(key = atom, value = proportion, Smw, Pmw, Kmw, Camw, Mgmw, Mnmw, Cmw, Nmw) %>%
+        select(id, date, atom, proportion)
+    tprop$atom <- sub("(.+)mw$" , "\\1", tprop$atom)
+
+    tsd <- df %>%
+        gather(key = atom, value = sd, Ssd, Psd, Ksd, Casd, Mgsd, Mnsd, Csd, Nsd) %>%
+        select(id, date, atom, sd)
+    tsd$atom <- sub("(.+)sd$" , "\\1", tprop$atom)
+
+    # $eplace < 0,1 with NA
+    tsd[with(tsd, which(sd == "< 0,1")), ]$sd <- NA
+    tsd$sd <- as.numeric(tsd$sd)
+
+    return(plyr::join(tprop, tsd, c("id", "date", "atom")))
 }
 
 # Load and optionally trim or plot data from a HOBO data logger.
@@ -219,7 +220,7 @@ IntegrateObs <- function(d, df1, df2, diag=FALSE) {
 # v: A cleaned data frame containing results from water chemistry analsysis
 # s: Creation of the csv file "FZJ WWTP ATS Pilot Chemistry and Biomass.csv"
 #
-WaterChemistryBiomass <- function() {
+WaterChemistryBiomass <- function(ti_df) {
     # Read the spreadsheet
     t_df <- read_excel(sswc_fn,
                        sheet="Tabelle1",
