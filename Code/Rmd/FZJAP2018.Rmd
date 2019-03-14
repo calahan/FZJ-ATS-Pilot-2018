@@ -7,6 +7,31 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
 ---
 
+```{r header}
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#
+# Copyright 2018-2019 by Forschungszentrum-Jülich (FZ-J)
+#
+# This file is part of the publication "FZJ ATS Pilot 2018" (FZJAP2018), a data
+# set documenting the results of an algal turf scrubbing pilot project performed
+# 15.07-15.09 2018, treating secondary sewage at FZ-J's campus wastewater treatment
+# plant.
+#
+# The software component of FZJAP2018 is open access: you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as published by the
+# Free Software Foundation, either version 3 of the License, or (at your option)
+# any later version.
+#
+# The software component of FZJAP2018 is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with the
+# software component of FZJAP2018. If not, see <http://www.gnu.org/licenses/>.
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+```
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, fig.height=3)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
