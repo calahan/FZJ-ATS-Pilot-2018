@@ -4,9 +4,7 @@
 .Ruserdata
 .DS_Store
 *.Rproj
-*.pdf
 *.hproj
 Documents/*
-Drafts/*
 Research/*
 Visual Elements/*
