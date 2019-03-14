@@ -71,8 +71,6 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE, fig.height=3)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```
 ```{r initialize}
-source("Code/R/Settings.R")
-source("Code/R/FZJAP2018.R")
 # Execute the following commands to knit, rather than use the knit button.
 # rmarkdown::render("Code/Rmd/FZJAP2018.Rmd", output_dir="Drafts", output_format = c("pdf_document"))
 # rmarkdown::render("Code/Rmd/FZJAP2018.Rmd", output_dir="Drafts", output_format = c("html_document",  "pdf_document", "word_document"))
@@ -87,43 +85,38 @@ source("Code/R/FZJAP2018.R")
 # knit: (function(inputFile, encoding) {
 #   rmarkdown::render(inputFile, encoding = encoding,
 #   output_dir = "output", output_format = "all") })
+source("Code/R/Settings.R")
+source("Code/R/FZJAP2018.R")
 ```
 # Introduction  
 Here we provide cleaned data, in the form of csv files, from the 2018 ATS pilot at
-Forschungszentrum-Jülich. Water quality and biomass data were entered manually into
-the spreadsheet `ATS Treatment.xlsx`. Biomass composition data was obtained by standard
-analyses and stored in the spreadsheet `Analysen ZEA-3.xlsx` (see Methods). To clean
-temperature and irradiance data, each week's data file (`ATS_<#.dd.mm.yy>.hobo`)
-was converted to csv using proprietary software (note that the files `*.hproj` contain
-metadata about the `.hobo` files and were not processed). Because the data loggers
-were either initialized in an office before being transported to the floway for
-installation, or downloaded after being removed from the floway and taken to the
-office, the initial and final observations of each file were discarded. Figures
-1-7 and the code that generated them show which observations were discarded. Valid
-observations were combined into a single data set and saved as a csv file. To clean
-the water quality and biomass data, spreadsheet data were loaded and reshaped into
-a schema more useful for analysis before being saved as a csv file.  
+Forschungszentrum-Jülich conducted by IBG-2/Alternative Biomass (for details, see
+Methods). Briefly: water quality and biomass productivity data were entered manually
+into the spreadsheet `ATS Treatment.xlsx`. Biomass composition data were obtained 
+by standard analyses and recorded in the spreadsheet `Analysen ZEA-3.xlsx`. Temperature
+and irradiance data were obtained from data loggers. Data cleaning comprised rearranging,
+renaming, or deleting various cells or observations to achieve tidy data.
 
 # Methods
-*Floway Configuration*. A 0.54 m × 2.5 m ATS floway and headworks was assembled from
+*Floway Configuration*. A 0.54 m × 2.5 m algal turf scrubber (ATS) floway and headworks was assembled from
 local home improvement store materials (Bauhaus, Belp, Switzerland; Hornbach Baumarkt
 AG, Bornheim, Germany) and lined with surplus growth substratum originally used
 for a thin layer algae spray reactor [@schreiber2017]. The floway was operated
 at the Forschungszentrum-Jülich (FZ-J) campus wastewater treatment plant (WWTP) 
 from August 15th to October 22nd, 2018. Influent was recirculated in batch mode 
-from a 1 m3 IBC tank filled to 0.5 m3 from the secondary treatment clarifier tank
+from a 1 m$^{3}$ IBC tank filled to 0.5 m$^{3}$ from the secondary treatment clarifier tank
 at the FZ-J WWTP. Water was exchanged by completely draining the IBC tank into a
-prior treatment tank then refilling with 0.5 m3 of influent. The inner walls and
+prior treatment tank then refilling with 0.5 m$^{3}$ of influent. The inner walls and
 bottom of the IBC tank were scrubbed during water exchange to reduce algal growth
 within the tank. Water exchange was performed Mondays through Thursdays, except
 for Wednesday, October 3. Commercially available centrifugal sump pumps were used
-to recirculate the water to the ATS floway at a rate of 37 L min-1 with a pulsing
+to recirculate the water to the floway at a rate of 37 L min$^{-1}$ with a pulsing
 interval of 15-20 s, provided by a tipping bucket at the headworks.  
 
 *Harvesting and Biomass Processing*. Harvesting was performed weekly by turning off
 the pumps, allowing the floway to drain for approximately 15 min, then manually 
 scraping biomass from the base and walls of the lower 1.6 m of the floway, comprising
-a total harvested area of 0.99 m2. The remainder of the biomass was left to facilitate
+a total harvested area of 0.99 m$^2$. The remainder of the biomass was left to facilitate
 re-colonization of the harvested area during the following growth interval. Scraped 
 biomass was collected into a tared jar and weighed to determine the fresh weight 
 of the harvested material. The biomass was dried by in an oven at 60°C for 24 hours
@@ -132,24 +125,18 @@ Weighed samples were frozen at -20° in airtight plastic bags.
 
 *Environmental Observations*. Floway water temperature and irradiance were logged 
 once per minute using a HOBO data logger and downloaded as csv files using proprietary
-software (Onset Computer Corporation, Bourne, MA). These values were integrated 
-by summation for each one- and four-day nutrient assay period and for each weekly
-harvest period. Temperature × irradiance was integrated for these periods by taking
-the products of the readings for each observation and summing these products over 
-the given period. Linear models correlating these three factors with biomass productivity
-and nutrient removal rates over their respective integration periods were constructed 
-using the lm() function in R (see manuscript-specific R code).  
+software (Onset Computer Corporation, Bourne, MA).
 
-*Water Chemistry*. One water sample (15 mL) was taken from the tailworks of the floway 
-before and one after water exchange. These were either analyzed within six hours 
-or frozen for later analysis. Prior to analysis, samples were centrifuged at room
-temperature for 10 minutes at a relative centrifugal force of 3,007 g. Soluble phosphate
-(PO4-P) and Total nitrogen (TN) were determined using a DR 5000 UV-Vis spectrophotometer
-after processing the samples with Hach LCK 349 (PO4-P) and LCK 138 (TN) kits. (All: 
-Hach Lange GmBH, Düsseldorf).  
+*Water Chemistry*. One water sample (15 mL) was taken from the tailworks of the 
+floway before and one after water exchange. These were either analyzed within six
+hours or frozen for later analysis. Prior to analysis, samples were centrifuged 
+at room temperature for 10 minutes at a relative centrifugal force of 3,007 g. Soluble
+phosphate (PO$_4$-P) and Total nitrogen (TN) were determined using a DR 5000 UV-Vis
+spectrophotometer after processing the samples with Hach LCK 349 (PO$_4$-P) and 
+LCK 138 (TN) kits. (All: Hach Lange GmBH, Düsseldorf).  
 
 *Biomass Composition*. Two 50 mg aliquots of each dried biomass sample, each with 2 
-mL HNO3 and 1 mL H2O2 were placed in closed Xpress containers (CEM Corporation, 
+mL HNO$_3$ and 1 mL H$_2$O$_2$ were placed in closed Xpress containers (CEM Corporation, 
 Matthews, NC, USA) and digested in a MARS 5 microwave digestion oven (CEM Corporation,
 Matthews, NC, USA) by heating to 160°C within 20 minutes and kept at this temperature
 for 15 minutes. The containers were then filled to 14 mL with deionized water. Two
@@ -157,66 +144,62 @@ aliquots of each sample solution obtained were diluted, one at 1:20 and one at 1
 and analyzed. Each dilution was assayed with ICP-OES (iCAP 6500, Thermo Scientific).
 Reference material NIST1515 (SRM1515, 2017) was included as control. Recovery for
 K was 101%, Ca 94%, Mg 94%, Mn 83% and P 90%. Measurements reflect the mean of two
-determinations.  
+determinations. Standard deviation for two observations, recorded originally as
+"< 0,1" are set to NA in the cleaned data.  
 
+# Data Cleaning  
+To clean the water quality and biomass data, spreadsheets were loaded and reshaped
+into a tidier schema before being saved as csv. Some columns of `ATS Treatment.xlsx`
+("Dilution PO4-P", "PO4-P", "reduction", "Dilution TNb", "TNb", "remark"), were 
+not retained in the cleaned data, while others (unnamed column with "before/after",
+"commend") were converted from character to logical for improved utility. All columns
+of `Analysen ZEA-3.xlsx` were retained. Temperature and irradiance logs (`ATS_<#.dd.mm.yy>.hobo`)
+were converted to csv using proprietary software (`*.hproj` contain metadata about 
+the `*.hobo` and were not processed). Because the data loggers were either initialized
+in an office before being transported to the floway for installation, or downloaded 
+after being removed from the floway and taken to an office, the initial and final 
+observations of each file were discarded. Figures 1-7 and the code that generated 
+them show which observations were discarded. Selected observations were combined 
+into a single data frame and saved as a csv file.  
 
-# Data Set Descriptions
-## Temperature and irradiance
-Each week's data is shown in several views, for both irradiance and temperature.
-First the entire data set is shown, with vertical blue lines indicating either the
-earliest observation that was retained (right hand side) or the latest observation
-that was retained (left hand side). This global view is followed by a magnification
-of the early and late regions. The numbers in the function call that performs the
-data cleaning refer to how many observations are removed from the beginning and
-end of the data set, respectively.
-
-## Water Quality, Biomass Productivity, Biomass Composition
-Some of the columns of `ATS Treatment.xlsx` ("Dilution PO4-P", "PO4-P", "reduction",
-"Dilution TNb", "TNb", "remark"), were not retained in the cleaned data, while others
-(unnamed column with "before/after", "commend") were converted from text to logical
-for improved ease of analysis. All of the columns of `Analysen ZEA-3.xlsx` were
-retained.
-
-\newpage
-# Data Cleaning.  
-## HOBO Data. `Week # (name of data logger)`
-### Week 1 (ATS_1)  
+# HOBO Data.  
+## Week 1 (ATS_1)  
 ```{r week1}
 # Create cleaned data set from the first week.
 ti_df <- CleanHOBOData(HOBO_fn[1], 1010, 365, w=1)
 ```
 
-### Week 2 (ATS_2)  
+## Week 2 (ATS_2)  
 ```{r week2}
 # Clean and append the data set from the following week.
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[2], 9773, 271, w=2))
 ```
 
-### Week 3 (ATS_1)  
+## Week 3 (ATS_1)  
 ```{r week3}
 # Clean and append the data set from the following week.
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[3], 119, 96, w=3))
 ```
 
-### Week 4 (ATS_2)  
+## Week 4 (ATS_2)  
 ```{r week4}
 # Clean and append the data set from the following week.
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[4], 107, 227, w=4))
 ```
 
-### Week 5 (ATS_1)  
+## Week 5 (ATS_1)  
 ```{r week5}
 # Clean and append the data set from the following week.
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[5], 107, 227, w=5))
 ```
 
-### Week 6 (ATS_2)  
+## Week 6 (ATS_2)  
 ```{r week6}
 # Clean and append the data set from the following week.
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[6], 121, 65, w=6))
 ```
 
-### Week 7 (ATS_1)  
+## Week 7 (ATS_1)  
 ```{r week7}
 # Clean and append the data set from the following week.
 ti_df <- ti_df %>% rbind(CleanHOBOData(HOBO_fn[7], 84, 54, w=7))
@@ -235,10 +218,10 @@ each sample on the day it was collected.
 
 ```{r WaterChemistryBiomass}
 # Load and clean the data in "ATS Treatment.xlsx"
-wcb_df <- WaterChemistryBiomass(ti_df)
+wcb_df <- WaterChemistryBiomass()
 
 # Display data for samples assayed both frozen and fresh
-#kable(WaterChemistryBiomassDupes())
+kable(WaterChemistryBiomassDupes(), caption="Differences among fresh and frozen samples")
 
 # Split the data into water chemistry and biomass productivity.
 wc_df <- wcb_df %>%
@@ -258,7 +241,7 @@ write_csv(bp_df, bp_fn)
 
 # Biomass Composition Data
 ```{r BiomassCompositionData}
-# Load cleaned biomass composition data from the spreadsheet.
+# Load and clean the data in "Analysen ZEA-3.xlsx"
 bc_df <- BiomassCompositionData(bcd)
 write_csv(bc_df, bc_fn)
 
@@ -323,5 +306,9 @@ kable(data.frame(Column = colnames(wc_df),
                                  "Observation date")),
       caption = wc_fn)
 ```
+
+# Acknowledgement
+This work was supported by the German Federal Ministry of Education and Research
+(BMBF) within the project Algnutrient-UrBioSol, Bioeconomy International  FKZ031B0453A.
 
 # References

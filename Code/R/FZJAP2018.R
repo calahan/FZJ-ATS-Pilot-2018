@@ -231,12 +231,11 @@ IntegrateObs <- function(d, df1, df2, diag=FALSE) {
 }
 
 # Create a cleaned data frame from the spreadsheet "ATS Treatment"
-# [todo]
 # i: NA
 # v: A cleaned data frame containing results from water chemistry analsysis
 # s: Creation of the csv file "FZJ WWTP ATS Pilot Chemistry and Biomass.csv"
 #
-WaterChemistryBiomass <- function(ti_df) {
+WaterChemistryBiomass <- function() {
     # Read the spreadsheet
     t_df <- read_excel(sswc_fn,
                        sheet="Tabelle1",
@@ -263,7 +262,7 @@ WaterChemistryBiomass <- function(ti_df) {
     # Impute missing times. We take the earliest time, and simply add 24 hours to it
     # [todo] Is this even used? There is something wrong here at any rate
     no_times <- which(is.na(t_df$time))
-    min_time <- min(ti_df[ti_df$week == 1,]$datetime)
+    #min_time <- min(ti_df[ti_df$week == 1,]$datetime)
     t_df[which(is.na(t_df$time)),]$time <- make_datetime(2018,
                                                          12,
                                                          31,
