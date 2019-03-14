@@ -1,10 +1,44 @@
 ---
-title: 'FZJ ATS Pilot 2018'
+title: 'Forschungszentrum-Jülich algal turf scrubbing pilot 2018 Data'
 author:
 - Dean Calahan^[Smithsonian Institution, Forschungszentrum Jülich]
 - Isabel Meuser and Ladislav Nedbal^[Forschungszentrum Jülich]
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
+references:
+- id: schreiber2017
+  title: Growth of algal biomass in laboratory and in large-scale algal photobioreactors in the temperate climate of western Germany
+  author:
+  - family: Schreiber
+    given: Christina
+  - family: Behrendt
+    given: Dominik
+  - family: Huber
+    given: Gregor
+  - family: Pfaff
+    given: Christian
+  - family: Widzgowski
+    given: Janka
+  - family: Ackermann
+    given: Bärbel
+  - family: Müller
+    given: Andreas
+  - family: Zachleder
+    given: Vilém
+  - family: Moudríková
+    given: Šárka
+  - family: Mojzeš
+    given: Peter
+  container-title: Bioresource Technology
+  volume: 234
+  URL: 'https://doi.org/10.1016/j.biortech.2017.03.028'
+  DOI: 10.1016/j.biortech.2017.03.028
+  publisher: Elsevier
+  page: 140-149
+  type: article-journal
+  issued:
+    year: 2017
+    month: 6
 ---
 
 ```{r header}
@@ -39,12 +73,12 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 ```{r initialize}
 source("Code/R/Settings.R")
 source("Code/R/FZJAP2018.R")
-# Execute the following command to knit, rather than use the knit button.
+# Execute the following commands to knit, rather than use the knit button.
+# rmarkdown::render("Code/Rmd/FZJAP2018.Rmd", output_dir="Drafts", output_format = c("pdf_document"))
 # rmarkdown::render("Code/Rmd/FZJAP2018.Rmd", output_dir="Drafts", output_format = c("html_document",  "pdf_document", "word_document"))
 #
-# [todo] Figure out the source of errors when using the following header to create
-# a Word document. Pperhaps setting root.dir is causative. Perhaps the environment
-# is getting disrupted.
+# [todo] Determine the source of errors when using the following YAML header to create
+# a Word document. Perhaps setting root.dir is causative.
 #
 # output 
 #   html_document: default
@@ -55,25 +89,76 @@ source("Code/R/FZJAP2018.R")
 #   output_dir = "output", output_format = "all") })
 ```
 # Introduction  
-Here we clean the data from the 2018 ATS pilot at Forschungszentrum-Jülich and generate
-csv files for further analysis. Temperature and irradiance data were downloaded
-weekly from a HOBO data logger. Water quality data was obtained by using standardized
-kits. Biomass productivity data was obtained by weighing wet and dried biomass harvested
-from a defined portion of the floway surface. Water quality and biomass data were
-entered manually into the spreadsheet `ATS Treatment.xlsx`. Biomass composition
-data was obtained by standard analyses and stored in the spreadsheet `Analysen ZEA-3.xlsx`.
-
-To clean the temperature and irradiance data, each week's data file (`ATS_<#.dd.mm.yy>.hobo`)
-was converted csv using the Onset's HOBOware software (note that the files `*.hproj`
-contain metadata bout the `.hobo` files and were not processed). Because the data
-loggers were either initialized in an office before being transported to the floway
-for installation, or downloaded after being removed from the floway and taken to
-the office, the initial and final observations had to be discarded. Figures 1-7
-and the code that generated them show which observations were discarded. The remaining
+Here we provide cleaned data, in the form of csv files, from the 2018 ATS pilot at
+Forschungszentrum-Jülich. Water quality and biomass data were entered manually into
+the spreadsheet `ATS Treatment.xlsx`. Biomass composition data was obtained by standard
+analyses and stored in the spreadsheet `Analysen ZEA-3.xlsx` (see Methods). To clean
+temperature and irradiance data, each week's data file (`ATS_<#.dd.mm.yy>.hobo`)
+was converted to csv using proprietary software (note that the files `*.hproj` contain
+metadata about the `.hobo` files and were not processed). Because the data loggers
+were either initialized in an office before being transported to the floway for
+installation, or downloaded after being removed from the floway and taken to the
+office, the initial and final observations of each file were discarded. Figures
+1-7 and the code that generated them show which observations were discarded. Valid
 observations were combined into a single data set and saved as a csv file. To clean
-the water quality and biomass data, recorded manually in an Excel spreadsheet, the
-spreadsheet data were loaded and manipulated into a schema more useful for analysis
-before being saved as a csv file.
+the water quality and biomass data, spreadsheet data were loaded and reshaped into
+a schema more useful for analysis before being saved as a csv file.  
+
+# Methods
+*Floway Configuration*. A 0.54 m × 2.5 m ATS floway and headworks was assembled from
+local home improvement store materials (Bauhaus, Belp, Switzerland; Hornbach Baumarkt
+AG, Bornheim, Germany) and lined with surplus growth substratum originally used
+for a thin layer algae spray reactor [@schreiber2017]. The floway was operated
+at the Forschungszentrum-Jülich (FZ-J) campus wastewater treatment plant (WWTP) 
+from August 15th to October 22nd, 2018. Influent was recirculated in batch mode 
+from a 1 m3 IBC tank filled to 0.5 m3 from the secondary treatment clarifier tank
+at the FZ-J WWTP. Water was exchanged by completely draining the IBC tank into a
+prior treatment tank then refilling with 0.5 m3 of influent. The inner walls and
+bottom of the IBC tank were scrubbed during water exchange to reduce algal growth
+within the tank. Water exchange was performed Mondays through Thursdays, except
+for Wednesday, October 3. Commercially available centrifugal sump pumps were used
+to recirculate the water to the ATS floway at a rate of 37 L min-1 with a pulsing
+interval of 15-20 s, provided by a tipping bucket at the headworks.  
+
+*Harvesting and Biomass Processing*. Harvesting was performed weekly by turning off
+the pumps, allowing the floway to drain for approximately 15 min, then manually 
+scraping biomass from the base and walls of the lower 1.6 m of the floway, comprising
+a total harvested area of 0.99 m2. The remainder of the biomass was left to facilitate
+re-colonization of the harvested area during the following growth interval. Scraped 
+biomass was collected into a tared jar and weighed to determine the fresh weight 
+of the harvested material. The biomass was dried by in an oven at 60°C for 24 hours
+and weighed. Dried biomass was homogenized by grinding with a mortar and pestle. 
+Weighed samples were frozen at -20° in airtight plastic bags.  
+
+*Environmental Observations*. Floway water temperature and irradiance were logged 
+once per minute using a HOBO data logger and downloaded as csv files using proprietary
+software (Onset Computer Corporation, Bourne, MA). These values were integrated 
+by summation for each one- and four-day nutrient assay period and for each weekly
+harvest period. Temperature × irradiance was integrated for these periods by taking
+the products of the readings for each observation and summing these products over 
+the given period. Linear models correlating these three factors with biomass productivity
+and nutrient removal rates over their respective integration periods were constructed 
+using the lm() function in R (see manuscript-specific R code).  
+
+*Water Chemistry*. One water sample (15 mL) was taken from the tailworks of the floway 
+before and one after water exchange. These were either analyzed within six hours 
+or frozen for later analysis. Prior to analysis, samples were centrifuged at room
+temperature for 10 minutes at a relative centrifugal force of 3,007 g. Soluble phosphate
+(PO4-P) and Total nitrogen (TN) were determined using a DR 5000 UV-Vis spectrophotometer
+after processing the samples with Hach LCK 349 (PO4-P) and LCK 138 (TN) kits. (All: 
+Hach Lange GmBH, Düsseldorf).  
+
+*Biomass Composition*. Two 50 mg aliquots of each dried biomass sample, each with 2 
+mL HNO3 and 1 mL H2O2 were placed in closed Xpress containers (CEM Corporation, 
+Matthews, NC, USA) and digested in a MARS 5 microwave digestion oven (CEM Corporation,
+Matthews, NC, USA) by heating to 160°C within 20 minutes and kept at this temperature
+for 15 minutes. The containers were then filled to 14 mL with deionized water. Two
+aliquots of each sample solution obtained were diluted, one at 1:20 and one at 1:50,
+and analyzed. Each dilution was assayed with ICP-OES (iCAP 6500, Thermo Scientific).
+Reference material NIST1515 (SRM1515, 2017) was included as control. Recovery for
+K was 101%, Ca 94%, Mg 94%, Mn 83% and P 90%. Measurements reflect the mean of two
+determinations.  
+
 
 # Data Set Descriptions
 ## Temperature and irradiance
@@ -196,7 +281,7 @@ kable(data.frame(Column = colnames(bc_df),
                                  "Harvest date",
                                  "Element assayed",
                                  "Mass proportion of element in sample",
-                                 "Standard deviation with n = 2")),
+                                 "Standard deviation of proportion with n = 2")),
       caption = bc_fn)
 
 # wet_biomass
@@ -230,13 +315,13 @@ kable(data.frame(Column = colnames(ti_df),
 kable(data.frame(Column = colnames(wc_df),
                  Description = c("Date and time of observation",
                                  "Was this sample taken before or after water exchange?",
-                                 "Soluble P04, mg L-1",
+                                 "Soluble PO4, mg L-1",
                                  "Total N, mg L-1",
                                  "ph",
                                  "Was this sample frozen?",
                                  "Date sample was assayed",
                                  "Observation date")),
       caption = wc_fn)
-
-
 ```
+
+# References

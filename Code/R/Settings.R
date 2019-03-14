@@ -35,11 +35,11 @@ library(ggplot2)
 # directories
 data_dir <- "Data/"
 csv_dir <- paste0(data_dir, "csv/")
-ss_dir <- paste0(data_dir, "Spreadsheets/")
+ss_dir <- paste0(data_dir, "xlsx/")
 
 # conversion factors
-yeardays <- 365     # days per year
-yearweeks <- 52     # weeks per year
+#yr2d <- 365     # days per year
+#yearweeks <- 52     # weeks per year
 C2K <- 273.15       # convert °C to °K
 
 # filenames
