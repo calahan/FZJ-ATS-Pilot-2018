@@ -16,3 +16,6 @@ The code comprises `FZJAP2018.R`, a collection of functions for creating the dat
 sets, `Settings.R`, a collection of variable definitions used by the code, and `FZJAP2018Data.Rmd`.
 
 Knit `FZJAP2018Data.Rmd` to clean the data and create the documentation.
+
+# Current Issues
+bc_tb: Need to verify id labels and dates - the labels seem out of order.

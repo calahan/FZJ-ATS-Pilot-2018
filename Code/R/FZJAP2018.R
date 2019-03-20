@@ -47,18 +47,18 @@ BiomassCompositionData <- function(args) {
 
     # Tidy ss data.
     tprop <- df %>%
-        gather(key = atom, value = proportion, Smw, Pmw, Kmw, Camw, Mgmw, Mnmw, Cmw, Nmw) %>%
-        select(id, date, atom, proportion)
+        gather(key = atom, value = wtprop, Smw, Pmw, Kmw, Camw, Mgmw, Mnmw, Cmw, Nmw) %>%
+        select(id, date, atom, wtprop)
     tprop$atom <- sub("(.+)mw$" , "\\1", tprop$atom)
 
     tsd <- df %>%
-        gather(key = atom, value = sd, Ssd, Psd, Ksd, Casd, Mgsd, Mnsd, Csd, Nsd) %>%
-        select(id, date, atom, sd)
+        gather(key = atom, value = wtpropsd, Ssd, Psd, Ksd, Casd, Mgsd, Mnsd, Csd, Nsd) %>%
+        select(id, date, atom, wtpropsd)
     tsd$atom <- sub("(.+)sd$" , "\\1", tprop$atom)
 
-    # $eplace < 0,1 with NA
-    tsd[with(tsd, which(sd == "< 0,1")), ]$sd <- NA
-    tsd$sd <- as.numeric(tsd$sd)
+    # Replace < 0,1 with NA, convert character to numeric
+    tsd[with(tsd, which(wtpropsd == "< 0,1")), ]$wtpropsd <- NA
+    tsd$wtpropsd <- as.numeric(tsd$wtpropsd)
 
     return(plyr::join(tprop, tsd, c("id", "date", "atom")))
 }
@@ -334,8 +334,8 @@ WaterChemistryBiomassDupes <- function() {
 MeanBiomassComposition <- function(df) {
     return(df %>%
                group_by(atom) %>%
-               summarize(mean = mean(proportion),
-                         sd = sd(proportion)))
+               summarize(mean = mean(wtprop),
+                         wtpropsd = sd(wtprop)))
 }
 
 # Plot biomass composition data by mass ratio
@@ -347,14 +347,14 @@ PlotBiomassCompositionData <- function(df) {
     #    masses <- setNames(mass(atoms), atoms)
 
     plot_df <- df %>%
-        gather_(key="reading", value="value", gather_cols=c("proportion")) %>%
-        select(date, atom, value, sd)
+        gather_(key="reading", value="value", gather_cols=c("wtprop")) %>%
+        select(date, atom, value, wtpropsd)
 
 
     # Plot weight percents of biomass composition readings with their standard deviations.
     return(ggplot(plot_df, aes(x=date, y=value, fill=atom)) +
                geom_bar(stat="identity", position=position_dodge()) +
-               geom_errorbar(aes(ymin=value-sd, ymax=value+sd),
+               geom_errorbar(aes(ymin=value-wtpropsd, ymax=value+wtpropsd),
                              position=position_dodge(),
                              na.rm=TRUE))
 }
@@ -373,7 +373,7 @@ PlotMeanBiomassCompositionData <- function(df) {
 
     return(ggplot(mbc_df, aes(x=reading, y=mean)) +
         geom_bar(stat="identity", position=position_dodge()) +
-        geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd),
+        geom_errorbar(aes(ymin=mean-wtpropsd, ymax=mean+wtpropsd),
                       position=position_dodge()))
 }
 
@@ -391,7 +391,7 @@ PlotMolarRatios <- function(df) {
     molrat_p <- (df %>% filter(atom == "P"))$molar
     df <- df %>%
         mutate(molarP = molar / molrat_p) %>%
-        mutate(molarPsd = sd * molar * molrat_p)
+        mutate(molarPsd = wtpropsd * molar * molrat_p)
 
     # ggplot orders x axis labels alphabetically, but with factors we order at will
     plot_order <- order(df$molarP, decreasing = TRUE)
