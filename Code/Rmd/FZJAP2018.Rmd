@@ -1,5 +1,5 @@
 ---
-title: 'Forschungszentrum-Jülich algal turf scrubbing pilot 2018 Data'
+title: 'Forschungszentrum-Jülich algal turf scrubbing pilot 2018'
 author:
 - Dean Calahan^[Smithsonian Institution, Forschungszentrum Jülich]
 - Isabel Meuser and Ladislav Nedbal^[Forschungszentrum Jülich]
@@ -44,12 +44,12 @@ references:
 ```{r header}
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #
-# Copyright 2018-2019 by Forschungszentrum-Jülich (FZ-J)
+# Copyright 2018-2019 by Forschungszentrum-Jülich (FZJ)
 #
-# This file is part of the publication "FZJ ATS Pilot 2018" (FZJAP2018), a data
-# set documenting the results of an algal turf scrubbing pilot project performed
-# 15.07-15.09 2018, treating secondary sewage at FZ-J's campus wastewater treatment
-# plant.
+# This file is part of digital object 10.5281/zenodo.2593844, "FZJ ATS Pilot 2018"
+# (FZJAP2018), a data set documenting the results of an algal turf scrubbing pilot
+# project performed 15.07-15.09 2018, treating secondary sewage at FZJ's campus 
+# wastewater treatment plant.
 #
 # The software component of FZJAP2018 is open access: you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as published by the
@@ -64,16 +64,17 @@ references:
 # You should have received a copy of the GNU General Public License along with the
 # software component of FZJAP2018. If not, see <http://www.gnu.org/licenses/>.
 #
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 ```
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, fig.height=3)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
-```
-```{r initialize}
-# Execute the following commands to knit, rather than use the knit button.
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Execute one of the following commands to knit, rather than use the knit button.
 # rmarkdown::render("Code/Rmd/FZJAP2018.Rmd", output_dir="Drafts", output_format = c("pdf_document"))
 # rmarkdown::render("Code/Rmd/FZJAP2018.Rmd", output_dir="Drafts", output_format = c("html_document",  "pdf_document", "word_document"))
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+```
+```{r initialize}
 #
 # [todo] Determine the source of errors when using the following YAML header to create
 # a Word document. Perhaps setting root.dir is causative.
@@ -89,13 +90,17 @@ source("Code/R/Settings.R")
 source("Code/R/FZJAP2018.R")
 ```
 # Introduction  
-Here we provide cleaned data, in the form of csv files, from the 2018 ATS pilot at
-Forschungszentrum-Jülich conducted by IBG-2/Alternative Biomass (for details, see
-Methods). Briefly: water quality and biomass productivity data were entered manually
-into the spreadsheet `ATS Treatment.xlsx`. Biomass composition data were obtained 
-by standard analyses and recorded in the spreadsheet `Analysen ZEA-3.xlsx`. Temperature
-and irradiance data were obtained from data loggers. Data cleaning comprised rearranging,
-renaming, or deleting various cells or observations to achieve tidy data.
+Here we provide [**cleaned data, in the form of csv files**](https://doi.org/10.5281/zenodo.2593844),
+from the 2018 ATS pilot
+at Forschungszentrum-Jülich conducted by the Institute for Bio- and Geosciences's
+Plant Sciences: Alternative Biomass department. Biomass composition data were obtained 
+by standard analyses and recorded in the spreadsheet `Analysen ZEA-3.xlsx`. Biomass
+productivity data were recorded manually in the spreadsheet `ATS Treatment.xlsx`.
+Temperature and irradiance data were obtained from HOBO data loggers and exported
+as csv files. Data was cleaned by knitting `FZJAP2018.Rmd`, which, using functions
+defined in `FZJAP2018.R` rearranges, renames, or or discards cells or observations.
+Four csv files are created, recording biomass composition and productivity, logged
+temperature and irradiance, and water chemistry.
 
 # Methods
 *Floway Configuration*. A 0.54 m × 2.5 m algal turf scrubber (ATS) floway and headworks was assembled from
@@ -248,11 +253,10 @@ write_csv(bc_df, bc_fn)
 # Plot biomass composition data.
 PlotBiomassCompositionData(bc_df)
 PlotMeanBiomassCompositionData(bc_df)
-PlotMolarRatios(bc_df)
+#PlotMolarRatios(bc_df)
 ```
 
 # Data Dictionaries 
-
 ```{r bcdd}
 # id
 # date
@@ -309,6 +313,6 @@ kable(data.frame(Column = colnames(wc_df),
 
 # Acknowledgement
 This work was supported by the German Federal Ministry of Education and Research
-(BMBF) within the project Algnutrient-UrBioSol, Bioeconomy International  FKZ031B0453A.
+(BMBF) within the project Algnutrient-UrBioSol, Bioeconomy International FKZ031B0453A.
 
 # References
