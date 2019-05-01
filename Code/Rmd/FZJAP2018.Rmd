@@ -5,6 +5,7 @@ author:
 - Isabel Meuser and Ladislav Nedbal^[Forschungszentrum Jülich]
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
+urlcolor: blue
 references:
 - id: schreiber2017
   title: Growth of algal biomass in laboratory and in large-scale algal photobioreactors in the temperate climate of western Germany
@@ -66,7 +67,7 @@ references:
 #
 ```
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, fig.height=3)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, cache = TRUE, fig.height=3)
 knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Execute one of the following commands to knit, rather than use the knit button.
@@ -250,7 +251,11 @@ write_csv(bp_df, bp_fn)
 bc_df <- BiomassCompositionData(bcd)
 write_csv(bc_df, bc_fn)
 
-# Plot biomass composition data.
+# Plot biomass productivity data
+barplot(matrix(c(bp_df$dry_biomass, bp_df$wet_biomass), ncol=7, byrow=TRUE),
+        xlab=bp_df$obsdate)
+
+# Plot biomass composition data
 PlotBiomassCompositionData(bc_df)
 PlotMeanBiomassCompositionData(bc_df)
 #PlotMolarRatios(bc_df)
