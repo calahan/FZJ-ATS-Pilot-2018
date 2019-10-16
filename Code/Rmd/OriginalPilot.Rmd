@@ -14,4 +14,14 @@
 # Original Pilot
 The Original Pilot (OP) ran at the final treatment tanks of the campus WWTP from August through November of 2018. It was then operated in the Novagreen greenhouse at the Algae Park until June of 2019, at which point it was moved back to the WWTP location. The floway length was extended in August of 2019, and the floway itself was divided into two narrower channels in order to perform controlled experiments, with one channel serving as a control and the other to test the treatment. The initial treatment selected is CO2 addition.
 
-## Current Status
+## Completing the Reconfiguration
+The Original Pilot is awaiting completion of reconfiguration to allow performance of an experiment involving CO${_2}$ addition to one of the two channels. The additional required construction steps to accomplish this reconfiguration are:
+
+* Submit a Risk Assessment involved with providing the CO${_2}$ tank at the site.
+* Reconfigure the site to allow safe storage and utilization of the CO${_2}$ tank.
+* Assemble a gas sparging apparatus.
+* Replace the existing dump bucket with a two-channel dump bucket.
+
+## Obtaining Publishable Data from the Reconfigured Pilot
+
+## Performing Additional Experiments.

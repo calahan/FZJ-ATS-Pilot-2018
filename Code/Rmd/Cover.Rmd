@@ -30,8 +30,8 @@ knitr::opts_knit$set(root.dir = "../../")
 ```
 \pagenumbering{gobble}
 \vspace{25mm}
-```{r c_figure, echo=FALSE, out.width="6 in", fig.align="center"}
-knitr::include_graphics("../../Visual Elements/Images/CO2 Sparger.png")
+```{r c_figure, echo=FALSE, out.width="4 in", fig.align="center"}
+knitr::include_graphics("../../Visual Elements/Images/Extended Original Pilot (Cropped).png")
 ```
 \newpage
 This document was built on `r format(Sys.time(), '%d %B %Y')` using `r R.Version()$version.string` and bookdown version `r packageVersion("bookdown")`
