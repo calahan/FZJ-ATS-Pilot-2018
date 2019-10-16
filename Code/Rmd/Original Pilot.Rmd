@@ -1,0 +1,17 @@
+<!-- Copyright 2019 by Forschungszentrum-Jülich (FZ-J). -->
+<!-- This file is part of the publication "FZ-J Pilot ATS Floways" -->
+<!-- (FZJPAF), documenting a concept for establishing a major ATS research -->
+<!-- program at Forschungszentrum Jülich. The software component of FZJPAF is -->
+<!-- open access: you can redistribute it and/or modify it under the terms of the -->
+<!-- GNU General Public License as published by the Free Software Foundation, -->
+<!-- either version 3 of the License, or (at your option) any later version. The -->
+<!-- software component of FZJPAF is distributed in the hope that it will be -->
+<!-- useful, but WITHOUT ANY WARRANTY; without even the implied warranty of -->
+<!-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General -->
+<!-- Public License for more details. You should have received a copy of the GNU -->
+<!-- General Public License along with the software component of FZJPAF. If not, -->
+<!-- see <http://www.gnu.org/licenses/>. -->
+# Original Pilot
+The Original Pilot (OP) ran at the final treatment tanks of the campus WWTP from August through November of 2018. It was then operated in the Novagreen greenhouse at the Algae Park until June of 2019, at which point it was moved back to the WWTP location. The floway length was extended in August of 2019, and the floway itself was divided into two narrower channels in order to perform controlled experiments, with one channel serving as a control and the other to test the treatment. The initial treatment selected is CO2 addition.
+
+## Current Status

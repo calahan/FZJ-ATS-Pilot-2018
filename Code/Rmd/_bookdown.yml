@@ -1,0 +1,4 @@
+rmd_files: ["Cover.Rmd",
+            "Introduction.Rmd",
+            "References.Rmd"
+            ]

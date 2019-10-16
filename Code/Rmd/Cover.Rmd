@@ -1,0 +1,38 @@
+---
+title: "FZ-J Pilot ATS Floways"
+author: "Dean Calahan"
+output:
+  bookdown::pdf_book:
+    toc: False
+header-includes:
+    - \usepackage{setspace}\doublespacing
+linkcolor: blue
+bibliography: "References.bib"
+biblio-style: "apalike"
+link-citations: true
+---
+<!-- Copyright 2019 by Forschungszentrum-Jülich (FZ-J). -->
+<!-- This file is part of the publication "FZ-J Pilot ATS Floways" -->
+<!-- (FZJPAF), documenting a concept for establishing a major ATS research -->
+<!-- program at Forschungszentrum Jülich. The software component of FZJPAF is -->
+<!-- open access: you can redistribute it and/or modify it under the terms of the -->
+<!-- GNU General Public License as published by the Free Software Foundation, -->
+<!-- either version 3 of the License, or (at your option) any later version. The -->
+<!-- software component of FZJPAF is distributed in the hope that it will be -->
+<!-- useful, but WITHOUT ANY WARRANTY; without even the implied warranty of -->
+<!-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General -->
+<!-- Public License for more details. You should have received a copy of the GNU -->
+<!-- General Public License along with the software component of FZJPAF. If not, -->
+<!-- see <http://www.gnu.org/licenses/>. -->
+
+```{r c_setup, include=FALSE}
+knitr::opts_knit$set(root.dir = "../../")
+```
+\pagenumbering{gobble}
+\vspace{25mm}
+```{r c_figure, echo=FALSE, out.width="6 in", fig.align="center"}
+knitr::include_graphics("../../Visual Elements/Images/CO2 Sparger.png")
+```
+\newpage
+This document was built on `r format(Sys.time(), '%d %B %Y')` using `r R.Version()$version.string` and bookdown version `r packageVersion("bookdown")`
+\newpage
