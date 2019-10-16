@@ -12,16 +12,26 @@
 <!-- General Public License along with the software component of FZJPAF. If not, -->
 <!-- see <http://www.gnu.org/licenses/>. -->
 # Original Pilot
-The Original Pilot (OP) ran at the final treatment tanks of the campus WWTP from August through November of 2018. It was then operated in the Novagreen greenhouse at the Algae Park until June of 2019, at which point it was moved back to the WWTP location. The floway length was extended in August of 2019, and the floway itself was divided into two narrower channels in order to perform controlled experiments, with one channel serving as a control and the other to test the treatment. The initial treatment selected is CO2 addition.
+The Original Pilot (OP) ran at the final treatment tanks of the campus WWTP from August through November of 2018. It was then operated in the Novagreen greenhouse at the Algae Park until June of 2019, at which point it was moved back to the WWTP location. The floway length was extended in August of 2019, and the floway itself was divided into two narrower channels in order to perform controlled experiments, with one channel serving as a control and the other to test the treatment. The initial treatment selected is CO${_2}$ addition.
 
 ## Completing the Reconfiguration
 The Original Pilot is awaiting completion of reconfiguration to allow performance of an experiment involving CO${_2}$ addition to one of the two channels. The additional required construction steps to accomplish this reconfiguration are:
 
-* Submit a Risk Assessment involved with providing the CO${_2}$ tank at the site.
+* Submit a Risk Assessment covering provision the CO${_2}$ tank at the site.
 * Reconfigure the site to allow safe storage and utilization of the CO${_2}$ tank.
-* Assemble a gas sparging apparatus.
+* Assemble a gas sparging apparatus, with pH-controlled CO${_2}$ addition into one channel.
 * Replace the existing dump bucket with a two-channel dump bucket.
 
 ## Obtaining Publishable Data from the Reconfigured Pilot
+Preliminary data from the 2018 outdoors run indicate that high-phosphate biomass can be produced while substantially reducing TN and soluble P concentrations. These results suggest that a high quality algal fertilizer can be produced and that by supplementing the influent with CO${_2}$ improved productivity and N removal can be accomplished. Key studies that must be performed to complete this work are:
 
-## Performing Additional Experiments.
+* Identify the chemical form and localization of P in the biomass.
+* Demonstrate equivalent performance in each channel when no CO${_2}$ is added.
+* Demonstrate increased biomass productivity and nutrient removal when CO${_2}$ is added.
+* Demonstrate the utility of ATS biomass as a fertilizer.
+
+As of this writing, the year is waning, and it is not certain that the floway can be kept running throughout the winter, although it is worth trying - algal grwoth does not stop, but rather declines, and it is worth establishin a lower limit on productivity and water treatment performance. In any case, the floway should be kept operating as long as possible. At worst, the CO${_2}$ experiments should be attempted if only to work out any bugs in the procedures. If there must be a pause in floway operations for winter, they should nevertheless be restarted as early as possible in 2020 and the CO${_2}$ experiments completed then.
+
+## Replacement of the Original Floway
+The Original Floway should probably be replaced. The headworks is of a different geometry than the current design for Science Floways. The floway modules are from the Science Floway design.
+Additional media
