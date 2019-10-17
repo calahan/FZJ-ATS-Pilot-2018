@@ -24,4 +24,10 @@ knitr::opts_knit$set(root.dir = "../../")
 source("Code/R/Settings.R")
 ```
 # Introduction
-This document describes in detail the work needed to complete reconfiguration of the small ATS pilot floway at the FZ-J campus WWTP and outlines additional work needed to complete the Exploratory Floways at the stabilization ponds and to assemble floways in the Algae Park greenhouses.
+This document describes in detail the work needed to complete reconfiguration of the small ATS pilot floway at the FZ-J campus WWTP, and outlines additional work needed to complete the floways at the stabilization ponds and to implement floways in the Algae Park greenhouses. It does not address the large scale floways currently known as the Production Floways.
+
+## Nomenclature
+The original floway built in 2018 will henceforth be referred to as the "Exploratory Floways" (see below for explanation of the plural). The floways located adjacent to the stabilization basins at the WWTP will be referred to as the "WWTP Floways". The floways planned for the Algae Park location will be referred to as the "Novagreen Floways" and the "IVG Floways". These are all described in more detail below.
+
+## General Requirements
+Completing the planned floways will require several steps. First, floway components need to be constructed. This could be done off-site by a contractor and then shipped, or done on-site. Second, the components need to be assembled into completed floways. Students could participate in some of the construction and assembly part of their education. Figure 2 is a preview of drawings for the required components (still missing: dump bucket drawings). Third, any associated hardware such as plumbing, sensors, and gas sparging equipment needs to be fitted and tested. Water then needs to begin flowing.

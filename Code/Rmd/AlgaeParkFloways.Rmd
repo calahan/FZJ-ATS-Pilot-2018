@@ -1,0 +1,36 @@
+<!-- Copyright 2019 by Forschungszentrum-Jülich (FZ-J). -->
+<!-- This file is part of the publication "FZ-J Pilot ATS Floways" -->
+<!-- (FZJPAF), documenting a concept for establishing a major ATS research -->
+<!-- program at Forschungszentrum Jülich. The software component of FZJPAF is -->
+<!-- open access: you can redistribute it and/or modify it under the terms of the -->
+<!-- GNU General Public License as published by the Free Software Foundation, -->
+<!-- either version 3 of the License, or (at your option) any later version. The -->
+<!-- software component of FZJPAF is distributed in the hope that it will be -->
+<!-- useful, but WITHOUT ANY WARRANTY; without even the implied warranty of -->
+<!-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General -->
+<!-- Public License for more details. You should have received a copy of the GNU -->
+<!-- General Public License along with the software component of FZJPAF. If not, -->
+<!-- see <http://www.gnu.org/licenses/>. -->
+# Algae Park Floways
+The Algae Park floways are concieved to be used for different purposes than the Wastewater Floways. The Novagreen Floways are intended for experiments for which environmental variables such as medium composition, temperature, and irradiance are under greater control than for the Wastewater Floways. The IVG Floways are intended to access Rur water for demonstrations and experiments with low-concentration, non-point-source influent.
+
+## Novagreen Floways
+Given modules that are 2.5 m long, it should be possible to implement four 0.5 m floways and two 0.25 m floways, all
+25 m long, in the currently mostly empty space in the Novagreen Greenhouse. Given that we are defining two standardized floway designs, one early experiment can be determining similarities and differences in performance between narrow and wide floways operated otherwise identically. If the two floway widths operate essentially identically, it may be worth replacing each wide floway with two narrow floways, to increase the number of factors that can be tested.
+
+Module type     |Number Required
+----------------|---------------
+Narrow Headworks|2
+Wide Headworks  |4
+Wide Trays      |16
+Wide Frames     |20
+
+## IVG Floways
+Here the plan is in general to perform single-pass operations, with water taken from the Rur source, passed through the floways, and then discharged into storm drains. Experiments with different levels of recirculation are also possible and desirable, as are expiriments with CO${_2}$ addition. Because the flow rate of Rur water is not high, two narrow floways are proposed, each 50 m long.
+
+Module type     |Number Required
+----------------|---------------
+Narrow Headworks|2
+Narrow Trays    |18
+Narrow Frames   |40
+

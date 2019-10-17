@@ -1,0 +1,29 @@
+<!-- Copyright 2019 by Forschungszentrum-Jülich (FZ-J). -->
+<!-- This file is part of the publication "FZ-J Pilot ATS Floways" -->
+<!-- (FZJPAF), documenting a concept for establishing a major ATS research -->
+<!-- program at Forschungszentrum Jülich. The software component of FZJPAF is -->
+<!-- open access: you can redistribute it and/or modify it under the terms of the -->
+<!-- GNU General Public License as published by the Free Software Foundation, -->
+<!-- either version 3 of the License, or (at your option) any later version. The -->
+<!-- software component of FZJPAF is distributed in the hope that it will be -->
+<!-- useful, but WITHOUT ANY WARRANTY; without even the implied warranty of -->
+<!-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General -->
+<!-- Public License for more details. You should have received a copy of the GNU -->
+<!-- General Public License along with the software component of FZJPAF. If not, -->
+<!-- see <http://www.gnu.org/licenses/>. -->
+
+\tableofcontents
+\newpage
+\pagenumbering{arabic}  
+
+```{r i_setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "../../")
+```
+```{r i_settings, include=FALSE}
+source("Code/R/Settings.R")
+```
+# Standard Floway Design
+The accompanying drawings depict a standardized modular floway design that is inexpensive and easy to build and modify. There are two configurations. The narrow (0.25 m) configuration is intended for situations where space is limited, when using defined media as influent (in order to reduce media requirements), or where long floways are desired but budget is limiting and there is less demand for biomass. The wide (0.5 m) configuration is intended for situations where influent supply is not limiting and more biomass is desired. The dimensions referred to are not exact but are a consequence of making full use of standard sizes of dimensional lumber. Some experimental work should probably be done to compare the performance of the narrow and wide designs under the same operating conditions as there may be differences deriving from shading or edge effects.
+
+## 
