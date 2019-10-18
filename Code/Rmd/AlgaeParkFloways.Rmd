@@ -12,7 +12,7 @@
 <!-- General Public License along with the software component of FZJPAF. If not, -->
 <!-- see <http://www.gnu.org/licenses/>. -->
 # Algae Park Floways
-The Algae Park floways are concieved to be used for different purposes than the Wastewater Floways. The Novagreen Floways are intended for experiments for which environmental variables such as medium composition, temperature, and irradiance are under greater control than for the Wastewater Floways. The IVG Floways are intended to access Rur water for demonstrations and experiments with low-concentration, non-point-source influent.
+The Algae Park floways are conceived to be used for different purposes than the Wastewater Floways. The Novagreen Floways are intended for experiments for which environmental variables such as medium composition, temperature, and irradiance are under greater control than for the Wastewater Floways. The IVG Floways are intended to access Rur water for demonstrations and experiments with low-concentration, non-point-source influent.
 
 ## Novagreen Floways
 Given modules that are 2.5 m long, it should be possible to implement four 0.5 m floways and two 0.25 m floways, all
@@ -26,7 +26,7 @@ Wide Trays      |16
 Wide Frames     |20
 
 ## IVG Floways
-Here the plan is in general to perform single-pass operations, with water taken from the Rur source, passed through the floways, and then discharged into storm drains. Experiments with different levels of recirculation are also possible and desirable, as are expiriments with CO${_2}$ addition. Because the flow rate of Rur water is not high, two narrow floways are proposed, each 50 m long.
+Here the plan is in general to perform single-pass operations, with water taken from the Rur source, passed through the floways, and then discharged into storm drains. Experiments with different levels of recirculation are also possible and desirable, as are experiments with CO${_2}$ addition. Because the flow rate of Rur water is not high, two narrow floways are proposed, each 50 m long.
 
 Module type     |Number Required
 ----------------|---------------
