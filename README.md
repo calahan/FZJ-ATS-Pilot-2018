@@ -18,10 +18,10 @@ Knit `FZJAP2018Data.Rmd` to clean the data and create the documentation.
 Path                |Filename                                    |Description
 --------------------|--------------------------------------------|--------------------------
 2018/Analysen ZEA-3/|Analyzen ZEA-3.xlsx                         |Elemental analysis (ICPOES)
-                    |Elemental Analysis for C, H, N, S and O.docx|Elemental analysis (#)
+&nbsp;              |Elemental Analysis for C, H, N, S and O.docx|Elemental analysis (#)
 2018/               |ATS Treatment_last version.xlsx             |Water analysis
 2018/HOBOware       |*.xslx                                      |Temperature & lux
-                    |Elemental Analysis for C, H, N, S and O.docx|
+&nbsp;              |Elemental Analysis for C, H, N, S and O.docx|
 2019/               |Treatment data.xlsx                         |
 2019/               |Weight data.xlsx                            |Biomass fresh & dry weight
 2019/HOBOware       |*.xslx                                      |Temperature & lux
