@@ -1,0 +1,19 @@
+---
+title: "Build Data Set"
+author: "Dean Calahan"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: html_document
+---
+
+## Knitr Settings
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "../../")
+```
+
+## Project Settings
+```{r water, include=TRUE}
+source("Code/R/Settings.R")
+```
+
+## Water Treatment Spreadsheets

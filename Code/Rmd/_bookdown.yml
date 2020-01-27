@@ -1,6 +1,5 @@
 rmd_files: ["Cover.Rmd",
             "Introduction.Rmd",
-            "ExploratoryFloways.Rmd",
-            "AlgaeParkFloways.Rmd",
-            "Figures.Rmd"
+            "PilotDataset.Rmd",
+            "PilotExploratory.Rmd"
             ]
