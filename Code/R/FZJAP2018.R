@@ -212,7 +212,7 @@ IntegrateObs <- function(d, df1, df2, diag=FALSE) {
 # v: A cleaned data frame containing results from water chemistry analsysis
 # s: Creation of the csv file "FZJ WWTP ATS Pilot Chemistry and Biomass.csv"
 #
-WaterChemistryBiomass <- function(fn) {
+WaterChemistryBiomass2018 <- function(fn) {
     # Read the spreadsheet
     t_df <- read_excel(fn,
                        sheet="Tabelle1",
@@ -238,9 +238,6 @@ WaterChemistryBiomass <- function(fn) {
                                    "ZEA"))
 
     # Impute missing times. We take the earliest time, and simply add 24 hours to it
-    # [todo] Is this even used? There is something wrong here at any rate
-    no_times <- which(is.na(t_df$time))
-    #min_time <- min(ti_df[ti_df$week == 1,]$datetime)
     t_df[which(is.na(t_df$time)),]$time <- make_datetime(2018,
                                                          12,
                                                          31,
@@ -279,10 +276,99 @@ WaterChemistryBiomass <- function(fn) {
     wqb_df$wet_biomass <- t_df$bmwet
     wqb_df$dry_biomass <- t_df$bmdry
     wqb_df$solids <- t_df$bmdrypct
+    
+    # Did ZEA analyze this sample?
+    wqb_df$ZEA <- !is.na(t_df$ZEA)
+    
+    # Need observation date separate from datetime to make life easier
+    wqb_df$obsdate <- make_date(year(wqb_df$datetime), month(wqb_df$datetime), day(wqb_df$datetime))
+    
+    # Impute person (person column added in 2019)
+    wqb_df$person <- "Isabel"
 
+    return(wqb_df)
+}
+
+# Structural changes to the spreadsheet are easier to deal with in a separate function
+WaterChemistryBiomass2019 <- function(fn) {
+    # Read the spreadsheet
+    t_df <- read_excel(fn,
+                       sheet="Tabelle1",
+                       skip=3,
+                       col_names=c("date",
+                                   "time",
+                                   "beforeafter",
+                                   "PO4dil",
+                                   "PO4P",
+                                   "PO4Pxdil",
+                                   "PO4Pred",
+                                   "dilTN",
+                                   "TNxdil",
+                                   "TN",
+                                   "TNred",
+                                   "comment",
+                                   "remark",
+                                   "assaydate",
+                                   "person",
+                                   "bmwet",
+                                   "bmdry",
+                                   "bmdrypct",
+                                   "pH",
+                                   "ZEA",
+                                   "harvest"))
+
+    # Impute missing times to 9:30
+    t_df[which(is.na(t_df$time)),]$time <- (9.5/24)
+
+    # There are some non-standard characters in t_df$time, impute it
+    t_df$time[which(t_df$time == "?")] <- (9.5/24)
+    
+    # the above come through as fractions rather than numbers of seconds, requiring
+    # shenanigans to eventually get something that will have a decent time value
+    # date doesn't matter here, we will be extracting only the time.
+    t_df$time <- as.POSIXct(as.Date("2019-01-01")) + (as.numeric(t_df$time) * 24 * 60 * 60)
+
+    # Create a new data frame with date and time combined into datetime for each observation
+    wqb_df <- data.frame(datetime=make_datetime(year(t_df$date),
+                                                month(t_df$date),
+                                                day(t_df$date),
+                                                hour(t_df$time),
+                                                minute(t_df$time),
+                                                second(t_df$time),
+                                                tz="Europe/Berlin"))
+
+    # Make before/after a logical
+    wqb_df$before <- TRUE
+    wqb_df[which(t_df$beforeafter != "before"),]$before <- FALSE
+
+    # Nutrient concentrations & pH
+    wqb_df$PO4P <- t_df$PO4Pxdil
+    wqb_df$TN <- t_df$TN
+    wqb_df$pH <- t_df$pH
+
+    # Make frozen/not frozen a logical
+    wqb_df$frozen <- TRUE
+    wqb_df[which(t_df$comment != "frozen"),]$frozen <- FALSE
+
+    # Date of assay
+    wqb_df$assaydate <- make_date(year(t_df$assaydate),
+                                  month(t_df$assaydate),
+                                  day(t_df$assaydate))
+
+    # Biomass measurements
+    wqb_df$wet_biomass <- t_df$bmwet
+    wqb_df$dry_biomass <- t_df$bmdry
+    wqb_df$solids <- t_df$bmdrypct
+    
+    # Did ZEA analyze this sample?
+    wqb_df$ZEA <- !is.na(t_df$ZEA)
+    
     # Need observation date separate from datetime to make life easier
     wqb_df$obsdate <- make_date(year(wqb_df$datetime), month(wqb_df$datetime), day(wqb_df$datetime))
 
+    # Person is a new column
+    wqb_df$person <- t_df$person
+    
     return(wqb_df)
 }
 

@@ -12,8 +12,22 @@ knitr::opts_knit$set(root.dir = "../../")
 ```
 
 ## Project Settings
-```{r water, include=TRUE}
+```{r proj_settings, include=TRUE}
 source("Code/R/Settings.R")
 ```
 
-## Water Treatment Spreadsheets
+## Data integrity
+```{r copy_files, include = TRUE}
+# Verify that local data matches raw data
+```
+
+## Load worksheets for each type of data
+```{r load_data, include = TRUE}
+# WWTP 2018
+fw_dir <- paste0(src_fw_dir[["WWTP Pilot"]], "2018/")
+fw_water_2018 <- WaterChemistryBiomass2018(paste0(fw_dir, "ATS Treatment_last version.xlsx"))
+
+fw_dir <- paste0(src_fw_dir[["WWTP Pilot"]], "2019/")
+fw_water_2019 <- WaterChemistryBiomass2019(paste0(fw_dir, "Treatment Data.xlsx"))
+```
+

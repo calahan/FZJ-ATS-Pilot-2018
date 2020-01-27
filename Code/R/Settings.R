@@ -20,11 +20,6 @@ data_dir <- "../../Data/"
 csv_dir <- paste0(data_dir, "csv/")
 xlsx_dir <- paste0(data_dir, "xlsx/")
 
-# Load each worksheet of each spreadsheet
-# WWTP 2018
-fw_dir <- paste0(src_fw_dir[["WWTP Pilot"]], "2018/")
-fw_water <- WaterChemistryBiomass(paste0(fw_dir, "ATS Treatment_last version.xlsx"))
-                      
 # conversion factors
 #yr2d <- 365     # days per year
 #yearweeks <- 52     # weeks per year
