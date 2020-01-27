@@ -6,21 +6,25 @@ library(knitr)
 library(PeriodicTable)
 library(ggplot2)
 
+source("Code/R/FZJAP2018.r")
+
 # input data directories
-src_data_dir <- "K:\\Projekte\\ATS\\Data\\"
+src_data_dir <- "K:/Projekte/ATS/Data/"
 src_fw_dir <- list();
 src_fw_dir[c("Novagreen", "WWTP Pilot")] <-
-    c(paste0(src_data_dir, "Novagreen\\"),
-      paste0(src_data_dir, "WWTP Pilot\\"))
+    c(paste0(src_data_dir, "Novagreen/"),
+      paste0(src_data_dir, "WWTP Pilot/"))
 
-# input data file names
-
-
+# local data directories
 data_dir <- "../../Data/"
 csv_dir <- paste0(data_dir, "csv/")
 xlsx_dir <- paste0(data_dir, "xlsx/")
 
-
+# Load each worksheet of each spreadsheet
+# WWTP 2018
+fw_dir <- paste0(src_fw_dir[["WWTP Pilot"]], "2018/")
+fw_water <- WaterChemistryBiomass(paste0(fw_dir, "ATS Treatment_last version.xlsx"))
+                      
 # conversion factors
 #yr2d <- 365     # days per year
 #yearweeks <- 52     # weeks per year
