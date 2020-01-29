@@ -6,8 +6,8 @@
 *.Rproj
 *.hproj
 Documents
-Data
-Data_x
+Data/*
+Data_x/*
 *.png
 *.jpg
 *.docx
