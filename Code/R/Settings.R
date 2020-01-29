@@ -1,6 +1,7 @@
 library(readxl)
 library(dplyr)
 library(tidyr)
+library(readr)
 library(lubridate)
 library(knitr)
 library(PeriodicTable)

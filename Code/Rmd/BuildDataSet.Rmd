@@ -2,8 +2,12 @@
 title: "Build Data Set"
 author: "Dean Calahan"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: html_document
+output: pdf_document
 ---
+
+# FZJ ATS Pilot 2018-2019  
+
+## Knitting *BuildDataSet.Rmd* creates this document and builds the data set from the raw data files. Raw data is stored in *Research/Data/* and was copied there from orginal sources on FZJ servers.  
 
 ## Knitr Settings
 ```{r setup}
@@ -31,7 +35,7 @@ fw_dir <- paste0(src_fw_dir[["WWTP Pilot"]], "2019/")
 fw_water_2019 <- WaterChemistryBiomass2019(paste0(fw_dir, "Treatment Data.xlsx"))
 
 # Elemental composition
-
+#BiomassCompositionData
 
 ```
 

@@ -1,5 +1,5 @@
 ---
-title: 'Forschungszentrum-Jülich algal turf scrubbing pilot 2018'
+title: 'Forschungszentrum-Jülich ATS pilot 2018'
 author:
 - Dean Calahan^[Smithsonian Institution, Forschungszentrum Jülich]
 - Isabel Meuser and Ladislav Nedbal^[Forschungszentrum Jülich]
