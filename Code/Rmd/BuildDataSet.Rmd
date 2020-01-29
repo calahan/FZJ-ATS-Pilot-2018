@@ -22,7 +22,8 @@ source("Code/R/Settings.R")
 
 ## Data integrity
 ```{r copy_files, include = TRUE}
-# Verify that local data matches raw data
+# If Data/ exists, assume it is valid, else copy the original data from Research/Data/
+CheckData()
 ```
 
 ## Extract data from relevant Excel spreadsheets

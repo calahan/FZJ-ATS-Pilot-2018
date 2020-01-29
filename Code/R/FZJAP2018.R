@@ -1,5 +1,6 @@
 # Functions
 # BiomassCompositionData : function ()
+# CheckData()
 # CleanHOBOData : function (fn, l, r, w)
 # HOBOData : function (fn, zone = "Europe/Berlin", trim = c(NA, NA), window = c(NA, NA), view = TRUE, text = FALSE, ret = FALSE, week = NA)
 # IntegrateObs : function (d, df1, df2, diag = FALSE)
@@ -136,6 +137,47 @@ HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), window=c(NA, NA),
     }
 }
 
+# If the directory "Data/" doesn't exist, create it and copy the original data there.
+CheckData <- function() {
+    if(!file.exists(data_dir)) {
+        # Create the directory structure
+        dir.create(data_dir)
+        dir.create(file.path(data_dir, "2018"))
+        dir.create(file.path(data_dir, "2018/HOBO"))
+        dir.create(file.path(data_dir, "2019"))
+        dir.create(file.path(data_dir, "2019/HOBO"))
+        
+        # Copy spreadsheets
+        file.copy(file.path(orig_data_dir, "2018", "ATS Treatment_last version.xlsx"),
+                  file.path(data_dir, "2018", "Treatment.xlsx"), copy.date = TRUE)
+        file.copy(file.path(orig_data_dir, "2018", "Biomasse.xlsx"),
+                  file.path(data_dir, "2018", "Biomass.xlsx"), copy.date = TRUE)
+        file.copy(file.path(orig_data_dir, "2018", "Analysen ZEA-3/Analysen ZEA-3.xlsx"),
+                  file.path(data_dir, "2018", "Elemental Analysis.xlsx"), copy.date = TRUE)
+        file.copy(file.path(orig_data_dir, "2019", "Treatment Data.xlsx"),
+                  file.path(data_dir, "2019", "Treatment.xlsx"), copy.date = TRUE)
+        file.copy(file.path(orig_data_dir, "2019", "Weight Data.xlsx"),
+                  file.path(data_dir, "2019", "Biomass.xlsx"), copy.date = TRUE)
+        file.copy(file.path(orig_data_dir, "2019", "ZEA-3", "191206_Ergebnisse_ICPOES.xlsx"),
+                  file.path(data_dir, "2019", "ICPOES.xlsx"), copy.date = TRUE)
+        file.copy(file.path(orig_data_dir, "2019", "ZEA-3", "auf191206_EA.XLS"),
+                  file.path(data_dir, "2019", "EA.XLS"), copy.date = TRUE)
+
+        # Copy HOBO csv files
+        file.copy(Sys.glob(file.path("Research", "Data", "2018", "HOBOware", "*.xlsx")),
+                  file.path("Data", "2018", "HOBO", "/"),
+                  copy.date = TRUE
+        )
+        file.copy(Sys.glob(file.path("Research", "Data", "2019", "HOBOware", "*.xlsx")),
+                  file.path("Data", "2019", "HOBO", "/"),
+                  copy.date = TRUE
+        )
+    } else {
+        cat(paste0(data_dir, " directory exists and is assumed correct"))
+    }
+}
+
+CleanHOBOData <- function(fn, l, r, w) {
 # i: fn     name of the csv file to clean
 #    l      index of the first observaton to keep
 #    r      index of the last observation to keep
@@ -145,7 +187,6 @@ HOBOData <- function(fn, zone="Europe/Berlin", trim=c(NA, NA), window=c(NA, NA),
 #           data boundaries, one pair zoomed in to the early cutoff zone, and one
 #           pair zoomed in to the late one
 #
-CleanHOBOData <- function(fn, l, r, w) {
     tb <- HOBOData(fn, view=FALSE, ret=TRUE, week=w)
     row_ct <- nrow(tb)
     HOBOData(fn, trim=c(l, r))
