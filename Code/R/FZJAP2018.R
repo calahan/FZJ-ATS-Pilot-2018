@@ -1,5 +1,5 @@
 # Functions
-# BiomassCompositionData : function ()
+# BiomassCompositionData : function (fn)
 # CheckData()
 # CleanHOBOData : function (fn, l, r, w)
 # HOBOData : function (fn, zone = "Europe/Berlin", trim = c(NA, NA), window = c(NA, NA), view = TRUE, text = FALSE, ret = FALSE, week = NA)
@@ -12,24 +12,84 @@
 # WaterChemistryBiomass : function ()
 # WaterChemistryBiomassDupes : function ()
 
+BiomassCompositionData2018 <- function(fn) {
 # Load biomass composition data from spreadsheet
 # i: args   List of function arguments maintained in Setup.R
 # v:        Tidy data frame of biomass composition data
 # s:        NA
-BiomassCompositionData <- function(args) {
-    # Load ss.
-    df <- read_excel(path =      args[["fn"]],
-                     sheet =     args[["sheet"]],
-                     skip=       args[["skip"]],
-                     col_names = args[["col_names"]])
 
-    # Tidy ss data.
+    # Load spreadsheet.
+    df <- read_excel(path = fn,
+                     sheet = "Tabelle1",
+                     skip = 18,
+                     col_names = c("id",
+                                   "date",
+                                   "Smw",
+                                   "Ssd",
+                                   "Pmw",
+                                   "Psd",
+                                   "Kmw",
+                                   "Ksd",
+                                   "Camw",
+                                   "Casd",
+                                   "Mgmw",
+                                   "Mgsd",
+                                   "Mnmw",
+                                   "Mnsd",
+                                   "Cmw",
+                                   "Csd",
+                                   "Nmw",
+                                   "Nsd"))
+
+    # Tidy the data.
     tprop <- df %>%
         gather(key = atom, value = wtprop, Smw, Pmw, Kmw, Camw, Mgmw, Mnmw, Cmw, Nmw) %>%
         select(id, date, atom, wtprop)
     tprop$atom <- sub("(.+)mw$" , "\\1", tprop$atom)
 
     tsd <- df %>%
+        gather(key = atom, value = wtpropsd, Ssd, Psd, Ksd, Casd, Mgsd, Mnsd, Csd, Nsd) %>%
+        select(id, date, atom, wtpropsd)
+    tsd$atom <- sub("(.+)sd$" , "\\1", tprop$atom)
+
+    # Replace < 0,1 with NA, convert character to numeric
+    tsd[with(tsd, which(wtpropsd == "< 0,1")), ]$wtpropsd <- NA
+    tsd$wtpropsd <- as.numeric(tsd$wtpropsd)
+
+    return(plyr::join(tprop, tsd, c("id", "date", "atom")))
+}
+
+BiomassCompositionData2019 <- function(fn_icp, fn_ea) {
+# Load biomass composition data from spreadsheet
+# i: args   List of function arguments maintained in Setup.R
+# v:        Tidy data frame of biomass composition data
+# s:        NA
+
+    # Load spreadsheet data
+    df_icp <- read_excel(path = fn_icp,
+                         sheet = "Bericht",
+                         skip = 13,
+                         col_names = c("element",
+                                       "na",
+                                       "percent",
+                                       "sd"))
+    
+    df_ea <- read_excel(path = fn_ea,
+                        sheet = "Ergebnis",
+                        skip = 2,
+                        n_max = 1,
+                        col_names = c("bm",
+                                      "C",
+                                      "H",
+                                      "N"))
+    
+    # Tidy the data.
+    tprop <- df_icp %>%
+        gather(key = atom, value = wtprop, Smw, Pmw, Kmw, Camw, Mgmw, Mnmw, Cmw, Nmw) %>%
+        select(id, date, atom, wtprop)
+    tprop$atom <- sub("(.+)mw$" , "\\1", tprop$atom)
+
+    tsd <- df_icp %>%
         gather(key = atom, value = wtpropsd, Ssd, Psd, Ksd, Casd, Mgsd, Mnsd, Csd, Nsd) %>%
         select(id, date, atom, wtpropsd)
     tsd$atom <- sub("(.+)sd$" , "\\1", tprop$atom)

@@ -26,17 +26,20 @@ source("Code/R/Settings.R")
 CheckData()
 ```
 
-## Extract data from relevant Excel spreadsheets
+## Load data from relevant Excel spreadsheets
 ```{r load_data, include = TRUE}
 # Water chemistry and biomass productivity
-fw_dir <- paste0(src_fw_dir[["WWTP Pilot"]], "2018/")
-fw_water_2018 <- WaterChemistryBiomass2018(paste0(fw_dir, "ATS Treatment_last version.xlsx"))
+treatment_2018 <- WaterChemistryBiomass2018(file.path(data_dir, "2018", "Treatment.xlsx"))
+treatment_2019 <- WaterChemistryBiomass2019(file.path(data_dir, "2019", "Treatment.xlsx"))
 
-fw_dir <- paste0(src_fw_dir[["WWTP Pilot"]], "2019/")
-fw_water_2019 <- WaterChemistryBiomass2019(paste0(fw_dir, "Treatment Data.xlsx"))
+# Biomass Elemental composition. In 2018 it was all in one spreadsheet, for 2019 it was in two
+biomass_2018 <- BiomassCompositionData2018(file.path(data_dir, "2018", "Elemental Analysis.xlsx"))
+biomass_2019 <- BiomassCompositionData2019(file.path(data_dir, "2019", "ICPOES.xlsx"),
+                                           file.path(data_dir, "2019", "EA.xls"))
 
-# Elemental composition
-#BiomassCompositionData
+# HOBO data
+
+# Irradiance data
 
 ```
 
