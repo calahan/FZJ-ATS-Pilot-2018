@@ -1,5 +1,4 @@
 rmd_files: ["Cover.Rmd",
             "Introduction.Rmd",
-            "PilotDataset.Rmd",
-            "PilotExploratory.Rmd"
+            "Substratum.Rmd"
             ]
