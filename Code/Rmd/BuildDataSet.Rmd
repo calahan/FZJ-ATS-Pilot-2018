@@ -1,45 +1,89 @@
 ---
-title: "Build Data Set"
+title: "FZJ WWTP ATS Pilot"
 author: "Dean Calahan"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
 ---
 
-# FZJ ATS Pilot 2018-2019  
-
-## Knitting *BuildDataSet.Rmd* creates this document and builds the data set from the raw data files. Raw data is stored in *Research/Data/* and was copied there from orginal sources on FZJ servers.  
-
-## Knitr Settings
-```{r setup}
+```{r FWAP_setup}
 knitr::opts_chunk$set(echo = TRUE)
 knitr::opts_knit$set(root.dir = "../../")
 ```
 
+# FZJ WWTP ATS Pilot
+
+Knitting this file additionally builds a cleaned data set if the directory ./Data/ has been deleted. The source data are read from xlsx files contained in the directory *Data/xlsx/[year]/*. Raw data files are located in *Research/Data/* and were copied there from their orginal sources on the FZJ campus network. Raw data comprises .xlsx, .xls, and .HOBO files. Non-.xlsx files were converted to .xlsx within their original source directories on the FZJ campus network, using Microsoft Excel v or HOBOWare v on Windows v.
+                
 ## Project Settings
-```{r proj_settings, include=TRUE}
+```{r FWAP_proj_settings, include=TRUE}
 source("Code/R/Settings.R")
 ```
 
 ## Data integrity
-```{r copy_files, include = TRUE}
-# If Data/ exists, assume it is valid, else copy the original data from Research/Data/
+```{r FWAP_copy_files, include = TRUE}
+# If ./Data/ exists, assume it is valid, else copy the original data from Research/Data/
 CheckData()
 ```
 
-## Load data from relevant Excel spreadsheets
-```{r load_data, include = TRUE}
+## Load water quality and biomass data from relevant Excel spreadsheets
+```{r FWAP_load_WC2018, include = TRUE}
 # Water chemistry and biomass productivity
-treatment_2018 <- WaterChemistryBiomass2018(file.path(data_dir, "2018", "Treatment.xlsx"))
-treatment_2019 <- WaterChemistryBiomass2019(file.path(data_dir, "2019", "Treatment.xlsx"))
-
+treatment_2018 <- WaterChemistryBiomass2018(
+    file.path(data_dir, "xlsx", "2018", "ATS Treatment_last version.xlsx"))
+```
+```{r FWAP_load_WC2019, include = TRUE}
+treatment_2019 <- WaterChemistryBiomass2019(
+    file.path(data_dir, "xlsx", "2019", "Treatment Data.xlsx"))
+```
+```{r FWAP_load_BC2018, include = TRUE}
 # Biomass Elemental composition. In 2018 it was all in one spreadsheet, for 2019 it was in two
-biomass_2018 <- BiomassCompositionData2018(file.path(data_dir, "2018", "Elemental Analysis.xlsx"))
-biomass_2019 <- BiomassCompositionData2019(file.path(data_dir, "2019", "ICPOES.xlsx"),
-                                           file.path(data_dir, "2019", "EA.xls"))
-
-# HOBO data
-
-# Irradiance data
-
+biomass_2018 <- BiomassCompositionData2018(
+    file.path(data_dir, "xlsx", "2018", "Analysen ZEA-3", "Analysen ZEA-3.xlsx")
+    )
+```
+```{r FWAP_load_BC2019, include = TRUE}
+biomass_2019 <- BiomassCompositionData2019(
+    file.path(data_dir, "xlsx", "2019", "191206_Ergebnisse_ICPOES.xlsx"),
+    file.path(data_dir, "xlsx", "2019", "auf191206_EA.XLSX")
+    )
 ```
 
+### Display loaded data
+```{r FWAP_tbl_WC_2018}
+knitr::kable(
+  treatment_2018,
+  caption = 'Water Treatment 2018'
+)
+```
+```{r FWAP_tbl_WC_2019}
+knitr::kable(
+  treatment_2019,
+  caption = 'Water Treatment 2019'
+)
+```
+```{r FWAP_tbl_BC_2018}
+knitr::kable(
+  biomass_2018,
+  caption = 'Biomass 2018'
+)
+```
+```{r FWAP_tbl_BC_2019}
+knitr::kable(
+  treatment_2019,
+  caption = 'Biomass 2019'
+)
+```
+
+## HOBO data
+Work in progress
+```{r FWAP_HOBO_data}
+```
+
+## Irradiance data
+Work in progress
+```{r FWAP_irradiance_data}
+```
+
+## Create Folders and Files for Dataset
+```{r FWAP_save_dataset}
+```

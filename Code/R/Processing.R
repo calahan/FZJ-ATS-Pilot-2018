@@ -24,31 +24,31 @@ BiomassCompositionData2018 <- function(fn) {
                      skip = 18,
                      col_names = c("id",
                                    "date",
-                                   "Smw",
-                                   "Ssd",
-                                   "Pmw",
-                                   "Psd",
-                                   "Kmw",
-                                   "Ksd",
-                                   "Camw",
-                                   "Casd",
-                                   "Mgmw",
-                                   "Mgsd",
-                                   "Mnmw",
-                                   "Mnsd",
-                                   "Cmw",
-                                   "Csd",
-                                   "Nmw",
-                                   "Nsd"))
+                                   "awS",
+                                   "sdS",
+                                   "awP",
+                                   "sdP",
+                                   "awK",
+                                   "sdK",
+                                   "awCa",
+                                   "sdCa",
+                                   "awMg",
+                                   "sdMg",
+                                   "awMn",
+                                   "sdMn",
+                                   "awC",
+                                   "sdC",
+                                   "awN",
+                                   "sdN"))
 
     # Tidy the data.
     tprop <- df %>%
-        gather(key = atom, value = wtprop, Smw, Pmw, Kmw, Camw, Mgmw, Mnmw, Cmw, Nmw) %>%
+        gather(key = atom, value = wtprop, awS, awP, awK, awCa, awMg, awMn, awC, awN) %>%
         select(id, date, atom, wtprop)
     tprop$atom <- sub("(.+)mw$" , "\\1", tprop$atom)
 
     tsd <- df %>%
-        gather(key = atom, value = wtpropsd, Ssd, Psd, Ksd, Casd, Mgsd, Mnsd, Csd, Nsd) %>%
+        gather(key = atom, value = wtpropsd, sdS, sdP, sdK, sdCa, sdMg, sdMn, sdC, sdN) %>%
         select(id, date, atom, wtpropsd)
     tsd$atom <- sub("(.+)sd$" , "\\1", tprop$atom)
 
@@ -59,6 +59,7 @@ BiomassCompositionData2018 <- function(fn) {
     return(plyr::join(tprop, tsd, c("id", "date", "atom")))
 }
 
+# This is data from the mixed biomass.
 BiomassCompositionData2019 <- function(fn_icp, fn_ea) {
 # Load biomass composition data from spreadsheet
 # i: args   List of function arguments maintained in Setup.R
@@ -73,7 +74,9 @@ BiomassCompositionData2019 <- function(fn_icp, fn_ea) {
                                        "na",
                                        "percent",
                                        "sd"))
-    
+
+    ticp <- df_icp %>% select(element, percent, sd)
+
     df_ea <- read_excel(path = fn_ea,
                         sheet = "Ergebnis",
                         skip = 2,
@@ -82,23 +85,16 @@ BiomassCompositionData2019 <- function(fn_icp, fn_ea) {
                                       "C",
                                       "H",
                                       "N"))
-    
-    # Tidy the data.
-    tprop <- df_icp %>%
-        gather(key = atom, value = wtprop, Smw, Pmw, Kmw, Camw, Mgmw, Mnmw, Cmw, Nmw) %>%
-        select(id, date, atom, wtprop)
-    tprop$atom <- sub("(.+)mw$" , "\\1", tprop$atom)
 
-    tsd <- df_icp %>%
-        gather(key = atom, value = wtpropsd, Ssd, Psd, Ksd, Casd, Mgsd, Mnsd, Csd, Nsd) %>%
-        select(id, date, atom, wtpropsd)
-    tsd$atom <- sub("(.+)sd$" , "\\1", tprop$atom)
+    extract <- function(str) {
+        t <- unlist(strsplit(str, "\\s"))
+        tv <- as.numeric(sub(",", ".", t[1]))
+        tsd <- as.numeric(sub(",", ".", t[3]))
+        return(c(tv, tsd))
+    }
+    tl <- lapply(c(df_ea$C, df_ea$H, df_ea$N), extract)
 
-    # Replace < 0,1 with NA, convert character to numeric
-    tsd[with(tsd, which(wtpropsd == "< 0,1")), ]$wtpropsd <- NA
-    tsd$wtpropsd <- as.numeric(tsd$wtpropsd)
-
-    return(plyr::join(tprop, tsd, c("id", "date", "atom")))
+    return()
 }
 
 # Load and optionally trim or plot data from a HOBO data logger.
@@ -206,7 +202,7 @@ CheckData <- function() {
         dir.create(file.path(data_dir, "2018/HOBO"))
         dir.create(file.path(data_dir, "2019"))
         dir.create(file.path(data_dir, "2019/HOBO"))
-        
+
         # Copy spreadsheets
         file.copy(file.path(orig_data_dir, "2018", "ATS Treatment_last version.xlsx"),
                   file.path(data_dir, "2018", "Treatment.xlsx"), copy.date = TRUE)
@@ -377,13 +373,13 @@ WaterChemistryBiomass2018 <- function(fn) {
     wqb_df$wet_biomass <- t_df$bmwet
     wqb_df$dry_biomass <- t_df$bmdry
     wqb_df$solids <- t_df$bmdrypct
-    
+
     # Did ZEA analyze this sample?
     wqb_df$ZEA <- !is.na(t_df$ZEA)
-    
+
     # Need observation date separate from datetime to make life easier
     wqb_df$obsdate <- make_date(year(wqb_df$datetime), month(wqb_df$datetime), day(wqb_df$datetime))
-    
+
     # Impute person (person column added in 2019)
     wqb_df$person <- "Isabel"
 
@@ -423,7 +419,7 @@ WaterChemistryBiomass2019 <- function(fn) {
 
     # There are some non-standard characters in t_df$time, impute it
     t_df$time[which(t_df$time == "?")] <- (9.5/24)
-    
+
     # the above come through as fractions rather than numbers of seconds, requiring
     # shenanigans to eventually get something that will have a decent time value
     # date doesn't matter here, we will be extracting only the time.
@@ -460,16 +456,16 @@ WaterChemistryBiomass2019 <- function(fn) {
     wqb_df$wet_biomass <- t_df$bmwet
     wqb_df$dry_biomass <- t_df$bmdry
     wqb_df$solids <- t_df$bmdrypct
-    
+
     # Did ZEA analyze this sample?
     wqb_df$ZEA <- !is.na(t_df$ZEA)
-    
+
     # Need observation date separate from datetime to make life easier
     wqb_df$obsdate <- make_date(year(wqb_df$datetime), month(wqb_df$datetime), day(wqb_df$datetime))
 
     # Person is a new column
     wqb_df$person <- t_df$person
-    
+
     return(wqb_df)
 }
 
