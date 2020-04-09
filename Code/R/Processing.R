@@ -94,7 +94,13 @@ BiomassCompositionData2019 <- function(fn_icp, fn_ea) {
     }
     tl <- lapply(c(df_ea$C, df_ea$H, df_ea$N), extract)
 
-    return()
+    return(
+        data.frame(
+            atom = c("C", "H", "N"),
+            pct = c(tl[[1]][1], tl[[2]][1], tl[[3]][1]),
+            sd = c(tl[[1]][2], tl[[2]][2], tl[[3]][2])
+        )
+    )
 }
 
 # Load and optionally trim or plot data from a HOBO data logger.

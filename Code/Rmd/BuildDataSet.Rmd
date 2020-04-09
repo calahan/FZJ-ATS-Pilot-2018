@@ -50,15 +50,24 @@ biomass_2019 <- BiomassCompositionData2019(
 
 ### Display loaded data
 ```{r FWAP_tbl_WC_2018}
+
 knitr::kable(
-  treatment_2018,
-  caption = 'Water Treatment 2018'
+  treatment_2018 %>% select(datetime, before, PO4P, TN, pH, frozen, assaydate, wet_biomass, dry_biomass),
+  caption = 'Water Treatment 2018 A'
+)
+knitr::kable(
+  treatment_2018 %>% select(solids, ZEA, obsdate, person),
+  caption = 'Water Treatment 2018 B'
 )
 ```
 ```{r FWAP_tbl_WC_2019}
 knitr::kable(
-  treatment_2019,
-  caption = 'Water Treatment 2019'
+  treatment_2019 %>% select(datetime, before, PO4P, TN, pH, frozen, assaydate, wet_biomass, dry_biomass),
+  caption = 'Water Treatment 2019 A'
+)
+knitr::kable(
+  treatment_2019 %>% select(solids, ZEA, obsdate, person),
+  caption = 'Water Treatment 2019 B'
 )
 ```
 ```{r FWAP_tbl_BC_2018}
@@ -69,7 +78,7 @@ knitr::kable(
 ```
 ```{r FWAP_tbl_BC_2019}
 knitr::kable(
-  treatment_2019,
+  biomass_2019,
   caption = 'Biomass 2019'
 )
 ```
