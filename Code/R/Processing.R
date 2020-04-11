@@ -24,26 +24,26 @@ BiomassCompositionData2018 <- function(fn) {
                      skip = 18,
                      col_names = c("id",
                                    "date",
-                                   "awS",
+                                   "S",
                                    "sdS",
-                                   "awP",
+                                   "P",
                                    "sdP",
-                                   "awK",
+                                   "K",
                                    "sdK",
-                                   "awCa",
+                                   "Ca",
                                    "sdCa",
-                                   "awMg",
+                                   "Mg",
                                    "sdMg",
-                                   "awMn",
+                                   "Mn",
                                    "sdMn",
-                                   "awC",
+                                   "C",
                                    "sdC",
-                                   "awN",
+                                   "N",
                                    "sdN"))
 
     # Tidy the data.
     tprop <- df %>%
-        gather(key = atom, value = wtprop, awS, awP, awK, awCa, awMg, awMn, awC, awN) %>%
+        gather(key = atom, value = wtprop, S, P, K, Ca, Mg, Mn, C, N) %>%
         select(id, date, atom, wtprop)
     tprop$atom <- sub("(.+)mw$" , "\\1", tprop$atom)
 

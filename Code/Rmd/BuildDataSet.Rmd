@@ -5,8 +5,8 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: pdf_document
 ---
 
-```{r FWAP_setup}
-knitr::opts_chunk$set(echo = TRUE)
+```{r FWAP_setup, echo = FALSE, include = TRUE}
+knitr::opts_chunk$set(echo = FALSE, include = TRUE)
 knitr::opts_knit$set(root.dir = "../../")
 ```
 
@@ -15,40 +15,41 @@ knitr::opts_knit$set(root.dir = "../../")
 Knitting this file additionally builds a cleaned data set if the directory ./Data/ has been deleted. The source data are read from xlsx files contained in the directory *Data/xlsx/[year]/*. Raw data files are located in *Research/Data/* and were copied there from their orginal sources on the FZJ campus network. Raw data comprises .xlsx, .xls, and .HOBO files. Non-.xlsx files were converted to .xlsx within their original source directories on the FZJ campus network, using Microsoft Excel v or HOBOWare v on Windows v.
                 
 ## Project Settings
-```{r FWAP_proj_settings, include=TRUE}
+```{r FWAP_proj_settings}
 source("Code/R/Settings.R")
 ```
 
 ## Data integrity
-```{r FWAP_copy_files, include = TRUE}
+```{r FWAP_copy_files}
 # If ./Data/ exists, assume it is valid, else copy the original data from Research/Data/
 CheckData()
 ```
 
-## Load water quality and biomass data from relevant Excel spreadsheets
-```{r FWAP_load_WC2018, include = TRUE}
+## Water quality and biomass data  
+### Load the raw data
+```{r FWAP_load_WC2018}
 # Water chemistry and biomass productivity
 treatment_2018 <- WaterChemistryBiomass2018(
     file.path(data_dir, "xlsx", "2018", "ATS Treatment_last version.xlsx"))
 ```
-```{r FWAP_load_WC2019, include = TRUE}
+```{r FWAP_load_WC2019}
 treatment_2019 <- WaterChemistryBiomass2019(
     file.path(data_dir, "xlsx", "2019", "Treatment Data.xlsx"))
 ```
-```{r FWAP_load_BC2018, include = TRUE}
+```{r FWAP_load_BC2018}
 # Biomass Elemental composition. In 2018 it was all in one spreadsheet, for 2019 it was in two
 biomass_2018 <- BiomassCompositionData2018(
     file.path(data_dir, "xlsx", "2018", "Analysen ZEA-3", "Analysen ZEA-3.xlsx")
     )
 ```
-```{r FWAP_load_BC2019, include = TRUE}
+```{r FWAP_load_BC2019}
 biomass_2019 <- BiomassCompositionData2019(
     file.path(data_dir, "xlsx", "2019", "191206_Ergebnisse_ICPOES.xlsx"),
     file.path(data_dir, "xlsx", "2019", "auf191206_EA.XLSX")
     )
 ```
 
-### Display loaded data
+### Display raw water chemistry and biomass data
 ```{r FWAP_tbl_WC_2018}
 
 knitr::kable(
@@ -83,6 +84,33 @@ knitr::kable(
 )
 ```
 
+### Assemble raw water chemistry and biomass data into clean data sets
+```{r FWAP_WC_2019}
+treatment <- treatment_2018 %>%
+    select(datetime, before, PO4P, TN, pH, frozen, assaydate, obsdate) %>%
+    bind_rows(
+        treatment_2019 %>% select(datetime, before, PO4P, TN, pH, frozen, assaydate, obsdate)
+    )
+
+harvest <- treatment_2018 %>%
+    filter(!is.na(dry_biomass)) %>%
+    select(datetime, wet_biomass, dry_biomass) %>%
+    bind_rows(
+        treatment_2019 %>%
+            filter(!is.na(dry_biomass)) %>%
+            select(datetime, wet_biomass, dry_biomass)
+    )
+
+biomass <- biomass_2018 %>%
+    select(date, atom, wtprop, wtpropsd) %>%
+    rename(pct = wtprop, sd = wtpropsd) %>%
+    mutate(type = "harvest") %>%
+    bind_rows(
+        biomass_2019 %>%
+            select(atom, pct, sd) %>%
+            mutate(type = "mix", date = ymd("2019-06-12", tz = "Europe/Berlin"))
+    )
+```
 ## HOBO data
 Work in progress
 ```{r FWAP_HOBO_data}
