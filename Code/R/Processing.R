@@ -43,20 +43,20 @@ BiomassCompositionData2018 <- function(fn) {
 
     # Tidy the data.
     tprop <- df %>%
-        gather(key = atom, value = wtprop, S, P, K, Ca, Mg, Mn, C, N) %>%
-        select(id, date, atom, wtprop)
-    tprop$atom <- sub("(.+)mw$" , "\\1", tprop$atom)
+        gather(key = element, value = wtprop, S, P, K, Ca, Mg, Mn, C, N) %>%
+        select(id, date, element, wtprop)
+    tprop$element <- sub("(.+)mw$" , "\\1", tprop$element)
 
     tsd <- df %>%
-        gather(key = atom, value = wtpropsd, sdS, sdP, sdK, sdCa, sdMg, sdMn, sdC, sdN) %>%
-        select(id, date, atom, wtpropsd)
-    tsd$atom <- sub("(.+)sd$" , "\\1", tprop$atom)
+        gather(key = element, value = wtpropsd, sdS, sdP, sdK, sdCa, sdMg, sdMn, sdC, sdN) %>%
+        select(id, date, element, wtpropsd)
+    tsd$element <- sub("(.+)sd$" , "\\1", tprop$element)
 
     # Replace < 0,1 with NA, convert character to numeric
     tsd[with(tsd, which(wtpropsd == "< 0,1")), ]$wtpropsd <- NA
     tsd$wtpropsd <- as.numeric(tsd$wtpropsd)
 
-    return(plyr::join(tprop, tsd, c("id", "date", "atom")))
+    return(plyr::join(tprop, tsd, c("id", "date", "element")))
 }
 
 # This is data from the mixed biomass.
@@ -75,7 +75,8 @@ BiomassCompositionData2019 <- function(fn_icp, fn_ea) {
                                        "percent",
                                        "sd"))
 
-    ticp <- df_icp %>% select(element, percent, sd)
+    ticp <- df_icp %>% select(element, percent, sd) %>%
+        rename(pct = percent)
 
     df_ea <- read_excel(path = fn_ea,
                         sheet = "Ergebnis",
@@ -94,13 +95,16 @@ BiomassCompositionData2019 <- function(fn_icp, fn_ea) {
     }
     tl <- lapply(c(df_ea$C, df_ea$H, df_ea$N), extract)
 
-    return(
-        data.frame(
-            atom = c("C", "H", "N"),
-            pct = c(tl[[1]][1], tl[[2]][1], tl[[3]][1]),
-            sd = c(tl[[1]][2], tl[[2]][2], tl[[3]][2])
-        )
+    tdf <- data.frame(
+        element = c("C", "H", "N"),
+        pct = c(tl[[1]][1], tl[[2]][1], tl[[3]][1]),
+        sd = c(tl[[1]][2], tl[[2]][2], tl[[3]][2])
     )
+    return(
+        ticp %>%
+            bind_rows(tdf)
+    )
+
 }
 
 # Load and optionally trim or plot data from a HOBO data logger.

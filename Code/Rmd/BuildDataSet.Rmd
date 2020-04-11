@@ -102,12 +102,12 @@ harvest <- treatment_2018 %>%
     )
 
 biomass <- biomass_2018 %>%
-    select(date, atom, wtprop, wtpropsd) %>%
+    select(date, element, wtprop, wtpropsd) %>%
     rename(pct = wtprop, sd = wtpropsd) %>%
     mutate(type = "harvest") %>%
     bind_rows(
         biomass_2019 %>%
-            select(atom, pct, sd) %>%
+            select(element, pct, sd) %>%
             mutate(type = "mix", date = ymd("2019-06-12", tz = "Europe/Berlin"))
     )
 ```
