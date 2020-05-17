@@ -23,13 +23,6 @@ awMn <- mass("Mn")
 awC <- mass("C")
 awN <- mass("N")
 
-# file names
-
-# # conversion factors
-# #yr2d <- 365     # days per year
-# #yearweeks <- 52     # weeks per year
-# C2K <- 273.15       # convert °C to °K
-#
 # # filenames
 # # i: csv files exported from HOBO downloads
 # HOBO_fn <- paste0(csv_dir, c("ATS_1.11.09.18.csv",
@@ -57,25 +50,3 @@ awN <- mass("N")
 # bp_fn <- paste0(csv_dir, pre, dataset[["bp"]], csv)     # biomass productivity
 # bc_fn <- paste0(csv_dir, pre, dataset[["bc"]], csv)     # biomass composition
 #
-# # function call parameters
-# bcd <- list("fn" = ssbc_fn,
-#             "sheet" = "Tabelle1",
-#             "skip" = 18,
-#             "col_names" = c("id",
-#                             "date",
-#                             "Smw",
-#                             "Ssd",
-#                             "Pmw",
-#                             "Psd",
-#                             "Kmw",
-#                             "Ksd",
-#                             "Camw",
-#                             "Casd",
-#                             "Mgmw",
-#                             "Mgsd",
-#                             "Mnmw",
-#                             "Mnsd",
-#                             "Cmw",
-#                             "Csd",
-#                             "Nmw",
-#                             "Nsd"))

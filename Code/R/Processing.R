@@ -75,8 +75,7 @@ BiomassCompositionData2019 <- function(fn_icp, fn_ea) {
                                        "percent",
                                        "sd"))
 
-    ticp <- df_icp %>% select(element, percent, sd) %>%
-        rename(pct = percent)
+    ticp <- df_icp %>% select(element, percent, sd)
 
     df_ea <- read_excel(path = fn_ea,
                         sheet = "Ergebnis",
@@ -97,7 +96,7 @@ BiomassCompositionData2019 <- function(fn_icp, fn_ea) {
 
     tdf <- data.frame(
         element = c("C", "H", "N"),
-        pct = c(tl[[1]][1], tl[[2]][1], tl[[3]][1]),
+        percent = c(tl[[1]][1], tl[[2]][1], tl[[3]][1]),
         sd = c(tl[[1]][2], tl[[2]][2], tl[[3]][2])
     )
     return(

@@ -37,12 +37,13 @@ treatment_2019 <- WaterChemistryBiomass2019(
     file.path(data_dir, "xlsx", "2019", "Treatment Data.xlsx"))
 ```
 ```{r FWAP_load_BC2018}
-# Biomass Elemental composition. In 2018 it was all in one spreadsheet, for 2019 it was in two
+# Biomass Elemental composition. In 2018 it was all in one spreadsheet
 biomass_2018 <- BiomassCompositionData2018(
     file.path(data_dir, "xlsx", "2018", "Analysen ZEA-3", "Analysen ZEA-3.xlsx")
     )
 ```
 ```{r FWAP_load_BC2019}
+# Biomass Elemental composition. In 2019 it was in two spreadsheets
 biomass_2019 <- BiomassCompositionData2019(
     file.path(data_dir, "xlsx", "2019", "191206_Ergebnisse_ICPOES.xlsx"),
     file.path(data_dir, "xlsx", "2019", "auf191206_EA.XLSX")
@@ -103,7 +104,7 @@ harvest <- treatment_2018 %>%
 
 biomass <- biomass_2018 %>%
     select(date, element, wtprop, wtpropsd) %>%
-    rename(pct = wtprop, sd = wtpropsd) %>%
+    rename(percent = wtprop, sd = wtpropsd) %>%
     mutate(type = "harvest") %>%
     bind_rows(
         biomass_2019 %>%
@@ -122,5 +123,8 @@ Work in progress
 ```
 
 ## Create Folders and Files for Dataset
-```{r FWAP_save_dataset}
+```{r FWAP_save_treatment}
+treatment %>% write.csv(file.path(data_dir, "csv", "treatment.csv"))
+harvest %>% write.csv(file.path(data_dir, "csv", "harvest.csv"))
+biomass %>% write.csv(file.path(data_dir, "csv", "biomass.csv"))
 ```
